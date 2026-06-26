@@ -14,6 +14,9 @@
 import os
 import logging as std_logging
 
+from dotenv import load_dotenv
+load_dotenv(override=True)
+
 import google.auth
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
