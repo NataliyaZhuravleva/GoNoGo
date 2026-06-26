@@ -25,19 +25,13 @@ The project uses `uv` for python virtual environment and package management.
 
 ## Running the CLI
 
-Run the multi-agent conditions checker CLI for tomorrow's forecast (default) or specify a custom date/range:
+Run the multi-agent conditions checker CLI to view the weekly conditions board (7 days starting tomorrow):
 ```bash
-# Run for tomorrow's date
+# Run the weekly conditions board
 uv run python -m gonogo.cli
 
-# Run for a specific date (within next 7 days)
-uv run python -m gonogo.cli --date 2026-06-28
-
-# Run for a date range (up to 7 days)
-uv run python -m gonogo.cli --date 2026-06-28 --end-date 2026-06-30
-
 # Run without ANSI colors
-uv run python -m gonogo.cli --date 2026-06-28 --no-color
+uv run python -m gonogo.cli --no-color
 ```
 
 ## Running Tests

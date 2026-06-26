@@ -49,13 +49,10 @@ def format_overall_cell(color: str, use_color: bool) -> str:
     else:
         return f"||   {format_verdict(color, False)}   "
 
-async def run_pipeline(start_date_str: str, end_date_str: str | None, use_color: bool):
+async def run_pipeline(use_color: bool):
     """Run the multi-agent Orchestrator pipeline and print results."""
-    query = start_date_str
-    if end_date_str:
-        query += f" to {end_date_str}"
-        
-    print(f"[{COLOR_GREEN}System{COLOR_RESET if use_color else ''}] Initializing GoNoGo conditions check for: '{query}'...")
+    query = ""
+    print(f"[{COLOR_GREEN}System{COLOR_RESET if use_color else ''}] Initializing GoNoGo 7-day conditions check...")
     
     # Check if GOOGLE_API_KEY is available
     if not os.environ.get("GOOGLE_API_KEY") and not os.environ.get("GEMINI_API_KEY"):
@@ -235,32 +232,16 @@ async def run_pipeline(start_date_str: str, end_date_str: str | None, use_color:
 def main():
     parser = argparse.ArgumentParser(description="GoNoGo Mountaineering Conditions Board CLI")
     parser.add_argument(
-        "--date",
-        type=str,
-        help="Target start date (YYYY-MM-DD). Defaults to tomorrow."
-    )
-    parser.add_argument(
-        "--end-date",
-        type=str,
-        help="Optional target end date (YYYY-MM-DD) for a custom range."
-    )
-    parser.add_argument(
         "--no-color",
         action="store_true",
         help="Disable ANSI colors in output."
     )
     
     args = parser.parse_args()
-    
-    # Calculate tomorrow as default start date
-    today = date.today()
-    default_start_str = (today + timedelta(days=1)).isoformat()  # tomorrow
-    
-    start_str = args.date or default_start_str
     use_color = not args.no_color
     
     # Run pipeline inside async loop
-    asyncio.run(run_pipeline(start_str, args.end_date, use_color))
+    asyncio.run(run_pipeline(use_color))
 
 if __name__ == "__main__":
     main()

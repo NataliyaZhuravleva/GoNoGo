@@ -82,9 +82,10 @@ def collect_feedback(feedback: Feedback) -> dict[str, str]:
 
 
 @app.get("/api/report")
-async def get_report(start_date: str, end_date: str | None = None):
+async def get_report(start_date: str | None = None, end_date: str | None = None):
     """Run the multi-agent Orchestrator pipeline and return the report in JSON format."""
     try:
+        from datetime import date, timedelta
         from gonogo.agents import OrchestratorAgent
         from google.adk.runners import Runner
         from google.adk.sessions import InMemorySessionService
@@ -92,6 +93,11 @@ async def get_report(start_date: str, end_date: str | None = None):
         import re
         import json
         
+        if not start_date:
+            today = date.today()
+            start_date = (today + timedelta(days=1)).isoformat()
+            end_date = (today + timedelta(days=7)).isoformat()
+            
         orchestrator = OrchestratorAgent()
         session_service = InMemorySessionService()
         user_id = "web-user"
@@ -554,17 +560,9 @@ def serve_dashboard():
 
         <div class="message-box" id="error-message"></div>
 
-        <!-- Date Range Form -->
-        <div class="controls-card">
-            <div class="input-group">
-                <label for="start-date">Start Date</label>
-                <input type="date" id="start-date">
-            </div>
-            <div class="input-group">
-                <label for="end-date">End Date (Optional)</label>
-                <input type="date" id="end-date">
-            </div>
-            <button class="btn-submit" id="btn-fetch">Check Conditions</button>
+        <!-- Date Range Controls -->
+        <div class="controls-card" style="justify-content: center; align-items: center;">
+            <button class="btn-submit" id="btn-fetch">Refresh Conditions</button>
         </div>
 
         <!-- Loading spinner -->
@@ -587,25 +585,12 @@ def serve_dashboard():
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const startDateInput = document.getElementById("start-date");
-            const endDateInput = document.getElementById("end-date");
             const fetchBtn = document.getElementById("btn-fetch");
             const loader = document.getElementById("loader");
             const errorMessage = document.getElementById("error-message");
             const recCard = document.getElementById("recommendation-card");
             const recText = document.getElementById("recommendation-text");
             const regionsContainer = document.getElementById("regions-container");
-
-            // Set default start date to tomorrow
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            startDateInput.value = tomorrow.toISOString().split("T")[0];
-
-            // Set max date limit (7 days from tomorrow)
-            const maxDate = new Date();
-            maxDate.setDate(maxDate.getDate() + 8);
-            startDateInput.max = maxDate.toISOString().split("T")[0];
-            endDateInput.max = maxDate.toISOString().split("T")[0];
 
             const colorClassMap = {
                 "green": "bg-green",
@@ -620,27 +605,21 @@ def serve_dashboard():
                 return "R";
             };
 
+            let isLoading = false;
+
             const loadReport = async () => {
-                const start = startDateInput.value;
-                const end = endDateInput.value;
-
-                if (!start) {
-                    showError("Please pick a valid start date.");
-                    return;
-                }
-
-                // Clean UI
-                errorMessage.style.display = "none";
-                recCard.style.display = "none";
-                regionsContainer.innerHTML = "";
-                loader.style.display = "flex";
-
-                let url = `/api/report?start_date=${start}`;
-                if (end) {
-                    url += `&end_date=${end}`;
-                }
+                if (isLoading) return;
+                isLoading = true;
 
                 try {
+                    // Clean UI
+                    errorMessage.style.display = "none";
+                    recCard.style.display = "none";
+                    regionsContainer.innerHTML = "";
+                    loader.style.display = "flex";
+
+                    let url = `/api/report`;
+
                     const response = await fetch(url);
                     const data = await response.json();
 
@@ -752,6 +731,8 @@ def serve_dashboard():
                     loader.style.display = "none";
                     showError("Failed to fetch forecast report. Make sure your server is running and your API key is correct.");
                     console.error(err);
+                } finally {
+                    isLoading = false;
                 }
             };
 

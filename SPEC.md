@@ -8,24 +8,24 @@
 
 ## Product concept
 
-A toorainy-style mountaineering conditions board for the Pacific Northwest. The user picks a date or date range — the only input, no free-text prompt — and sees a report covering **all 12 regions at once**, sorted north to south, each with a short agent-written note and a 3-tier (base/mid/peak elevation) conditions table. A single best-overall recommendation is pinned at the top. No personalization, no preference questions.
+A toorainy-style mountaineering conditions board for the Pacific Northwest. The board automatically displays a weekly conditions report (7 days starting tomorrow) covering **all 12 regions at once**, sorted north to south, each with a short agent-written note and a 3-tier (base/mid/peak elevation) conditions table. A single best-overall recommendation is pinned at the top. No personalization, no preference questions.
 
 Page structure, top to bottom:
-1. **Top recommendation** — one sentence naming the best region (and day, if a range was selected) with a short reason.
+1. **Top recommendation** — one sentence naming the best region and day with a short reason.
 2. **12 regions, north to south** — region name, short agent-written note, base/mid/peak conditions table.
 
 ## MVP scope — IN
 
 - Mountaineering only (no rock/ice climbing, ski touring, biking yet — but keep `activity_tags` extensible).
 - Fixed 12 PNW regions (see `data/regions.json`), always shown all at once, sorted north→south by latitude.
-- Input: date or date range picker only. No chat, no preferences.
+- Input: None required. A single button allows refreshing the weekly board.
 - Each region's weather = its **single highest peak** ("headline peak") at **3 elevation tiers: base, mid, peak**. No cross-peak averaging — see `data/regions.json`'s `tiers` field, already computed from real trailhead/camp research.
 - Weather source: **Open-Meteo** (`https://api.open-meteo.com/v1/forecast`), free, no key, supports multi-location batched requests via comma-separated coordinates.
 - Agent writes a short note per region + one top recommendation, generated from structured tier data (no preferences to weigh).
 
 ## MVP scope — OUT (don't build, but don't block later)
 
-- Free-text chat interface (date-picker only for now; agents are reusable later).
+- Free-text chat interface or interactive query inputs.
 - Peak-level drill-down UI (data already supports it via the `peaks` array, just not exposed as a screen).
 - External trip-report pulling (WTA/AllTrails/Mountain Project) — leave room via future `routes`/`external_ids` fields.
 - Persistent cross-session memory.
@@ -62,7 +62,7 @@ reuse, modification, or redistribution without the author's permission.
 
 
 
-- **Agentic pattern**: tool/function calling to fetch weather — agent decides what to fetch, not static context dump. Trigger is structured (date/range), not natural language, but the pattern is the same.
+- **Agentic pattern**: tool/function calling to fetch weather — agent decides what to fetch, not static context dump.
 - **Use Google ADK**, not raw `google-genai` SDK calls — the course covered ADK multi-agent patterns and Skills; this capstone should demonstrate them. Use ADK's session/state service (keep door open for future per-user memory). Use `agents-cli` to scaffold if Antigravity has it.
 - **Multi-agent, but not every sub-agent needs to be LLM-backed.** Only use the model where real reasoning/generation happens. Deterministic steps (fetching, coloring) should stay plain code or non-LLM ADK agents — intentional, keeps cost down.
 - **Skills**: at least one real ADK Agent Skill, loaded on demand, not pasted into every system prompt.
@@ -71,7 +71,7 @@ reuse, modification, or redistribution without the author's permission.
 
 ## Agent architecture (multi-agent + skill)
 
-1. **Orchestrator** (root, workflow/Sequential controller — doesn't need to be LLM-backed) — validates the date/range input, triggers Conditions then Advisor in sequence, sorts output north→south, places top recommendation above the list.
+1. **Orchestrator** (root, workflow/Sequential controller — doesn't need to be LLM-backed) — triggers Conditions then Advisor in sequence, sorts output north→south, places top recommendation above the list.
 2. **Conditions agent** (deterministic, no LLM) — owns the Open-Meteo tool. For each region's `headline_peak_id`, builds 3 coordinate-elevation pairs from `tiers`, batches all 12×3=36 into one request, returns structured per-region-per-tier data. No reasoning, no coloring, no cross-peak averaging.
 3. **Advisor agent** (this is where LLM reasoning happens) — receives all 12 regions' tier data + the deterministic color verdicts (see Overview dashboard), produces in **one batched call**: a short note per region + the single top-pick recommendation with a short reason. No preferences to weigh — synthesis of data, not personalized ranking. Loads the Skill below.
 
@@ -85,10 +85,10 @@ Package this as a real ADK Skill (its own file/package with instructions + metad
 
 ## Overview dashboard (toorainy-style, 3-tier) — the only screen in this MVP
 
-Modeled on toorainy.com: show every region at once, no single-region drill-in first. Only control is the date/range picker.
+Modeled on toorainy.com: show every region at once, no single-region drill-in first. Only control is a Refresh button.
 
 1. **Top recommendation** pinned above everything.
-2. **12 regions, north→south.** Each: name, short Advisor note, three stacked tables (**base/mid/peak**). Each tier-table: next 3 days × 3 day-parts (morning/midday/evening) = 9 columns, composite green/yellow/red cell.
+2. **12 regions, north→south.** Each: name, short Advisor note, three stacked tables (**base/mid/peak**). Each tier-table: next 7 days × 3 day-parts (morning/midday/evening) = 21 columns, composite green/yellow/red cell.
 3. **Overall column per region per tier**: worst color among that tier-table's visible cells — implements "one red cell and I skip it."
 4. **Region-level badge**: precipitation in the last 48h (Open-Meteo `past_days`), once per region.
 
@@ -98,7 +98,7 @@ Rendering can stay simple (clean text/markdown) until a later phase — a real d
 
 ## Quality, security & observability (lightweight, build progressively across phases)
 
-- **Date-range guardrail**: validate input, cap at ~7 days (Open-Meteo's reliable horizon), reject malformed/past-only ranges clearly.
+- **7-day weekly horizon**: automatically defaults to a 7-day range starting tomorrow, aligned to Open-Meteo's reliable forecast horizon.
 - **Scope guardrail**: all peak/region computation comes strictly from `data/regions.json`.
 - **Tool-output injection guardrail**: Conditions and Advisor agents both treat Open-Meteo responses as untrusted data, never instructions.
 - **Lightweight eval**: 3-5 hardcoded golden scenarios (mocked weather → obviously-correct expected outcome), no live API/model calls needed.
@@ -108,9 +108,8 @@ Rendering can stay simple (clean text/markdown) until a later phase — a real d
 ## Overall definition of done (full project, checked progressively across phases)
 
 - Project runs locally with documented setup.
-- A sample date and a sample date range each produce a full report (top rec + 12 regions north→south, notes, 3 tier-tables) — real Open-Meteo data, real agent pipeline (Orchestrator → Conditions → Advisor), not mocked or monolithic.
+- Running the app produces a full weekly report (top rec + 12 regions north→south, notes, 3 tier-tables) — real Open-Meteo data, real agent pipeline (Orchestrator → Conditions → Advisor), not mocked or monolithic.
 - Advisor notes visibly reflect the Skill's content (mention freezing level/wind exposure, not generic "sunny/not sunny").
-- Out-of-range dates rejected/clamped with a clear message.
 - Golden-set eval passes without live API/model calls (or a small fixed number).
 - Log file shows per-agent, per-tool trace after a run.
 - Headline-peak selection (max elevation per region) is a tested pure function.

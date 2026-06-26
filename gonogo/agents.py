@@ -163,16 +163,25 @@ class OrchestratorAgent(BaseAgent):
     ) -> AsyncGenerator[Event, None]:
         user_query = ctx.user_content.parts[0].text.strip()
         
-        # Parse query for dates
+        # Parse query for dates if present
         parts = [p.strip() for p in user_query.replace("to", " ").split() if p.strip()]
-        if not parts:
-            raise ValueError(f"No dates found in query '{user_query}'")
-            
-        start_date_str = parts[0]
-        end_date_str = parts[1] if len(parts) > 1 else None
         
-        # Step 1: Input Validation / Date Guardrail
-        start_date, end_date, warning = validate_and_clamp_date_range(start_date_str, end_date_str)
+        has_date = False
+        if parts:
+            if re.match(r"^\d{4}-\d{2}-\d{2}$", parts[0]):
+                has_date = True
+                
+        if has_date:
+            start_date_str = parts[0]
+            end_date_str = parts[1] if (len(parts) > 1 and re.match(r"^\d{4}-\d{2}-\d{2}$", parts[1])) else None
+            start_date, end_date, warning = validate_and_clamp_date_range(start_date_str, end_date_str)
+        else:
+            from datetime import timedelta
+            today = date.today()
+            start_date = today + timedelta(days=1)
+            end_date = start_date + timedelta(days=6)
+            warning = None
+            
         if warning:
             yield Event(
                 author=self.name,
