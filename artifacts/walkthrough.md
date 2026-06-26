@@ -1,47 +1,64 @@
-# Phase 2 Walkthrough - GoNoGo (Agents + Skill)
+# Phase 3 Walkthrough - GoNoGo (Report, Guardrails, and Logging)
 
-We have successfully implemented the ADK Multi-Agent workflow, including the physical domain knowledge skill package, CLI runner integration, and extensive unit/mock testing.
+We have successfully implemented the Phase 3 requirements, including UI rendering of stacked elevation tier tables, worst-color overall logic, precipitation badges, defensive scope guardrails, structured JSONL trace logging, and 5 offline golden-set tests.
 
 ## Changes Made
 
-### 1. Scaffolding & Dependencies
-- Added `google-adk[gcp]>=2.0.0,<3.0.0` to [pyproject.toml](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/pyproject.toml).
-- Ran `agents-cli scaffold enhance` to register the project as an ADK project.
-- Relocated code package to [gonogo/](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo) in the root directory to satisfy ADK module identification conventions.
+### 1. Stacked Elevation Tables & Overall Color Logic (`gonogo/cli.py`)
+- Updated the CLI reporting engine to render three stacked tables per region representing **Peak**, **Mid**, and **Base** elevations.
+- Computed the **Overall** column using the "worst color" logic across all forecast cells (implementing "one red cell and I skip it").
+- Integrated a per-region badge displaying **past 48h precipitation** fetched dynamically from Open-Meteo.
+- Ensured perfect table column width-alignment of **13 characters** per day column in both colored (using ANSI escapes) and non-colored modes.
 
-### 2. Mountaineering Conditions Skill
-- Created the skill package under [gonogo/skills/mountaineering-conditions-skill/](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/skills/mountaineering-conditions-skill).
-- Wrote [SKILL.md](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/skills/mountaineering-conditions-skill/SKILL.md) which contains detailed domain guidelines regarding wind thresholds, freeze-thaw and rockfall hazard elevation boundaries, precipitation hazard types, and whiteout/visibility criteria.
+### 2. Defensive Scope Guardrail (`gonogo/core.py`)
+- Implemented a scope guardrail validating that only the 12 authorized region IDs from the Pacfic Northwest region set are processed. Any unrecognized region IDs in `regions.json` immediately trigger a `ValueError`.
 
-### 3. ADK Agents (`gonogo/agents.py`)
-Implemented three sequential agents:
-- **`ConditionsAgent`**: Deterministic, zero LLM calls. Bypasses the Gemini API entirely to call the Open-Meteo weather fetch tool, serialize output to Pydantic-validated models (guardrail against injection), and yield the state delta to update the session.
-- **`AdvisorAgent`**: LLM-backed (`gemini-2.5-flash`). Configured with a `SkillToolset` loaded dynamically from the physical skill package folder. Instructed to load the skill and output a clean JSON structure within a markdown code block containing conditions notes for all 12 regions (sorted North-to-South) and one overall top recommendation. Executes exactly one Gemini call.
-- **`OrchestratorAgent`**: Parent `BaseAgent` coordinating the pipeline. Performs date range validation, runs the sub-agents sequentially via `Aclosing(agent.run_async())`, and propagates state.
+### 3. Structured Logging Plugin (`gonogo/app_utils/telemetry.py`)
+- Developed a custom ADK `StructuredLoggingPlugin` that hooks into agent and tool lifecycles.
+- Records step name, type (agent/tool), start/end timestamp, latency, completion status, and arguments to `gonogo_runs.jsonl` in the root repository folder.
+- Configured CLI runner in `gonogo/cli.py` and FastAPI server app in `gonogo/agent.py` to register this logging plugin.
 
-### 4. Integration & E2E Testing Support (`gonogo/agent.py` & `gonogo/fast_api_app.py`)
-- Created [agent.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/agent.py) exposing `root_agent = OrchestratorAgent()` and `app = App(root_agent)`.
-- If `INTEGRATION_TEST == "TRUE"` is detected in the environment, `agent.py` loads `MockRootAgent` (a `BaseAgent` subclass making zero LLM calls) to satisfy boilerplate test suites.
-- Added a `FallbackLogger` in [fast_api_app.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/fast_api_app.py) to prevent crash failures when credentials or GC projects are missing in local offline test runs.
+### 4. Offline Golden-Set Evaluation (`tests/test_golden_set.py`)
+Created 5 offline-enabled test cases to verify the rule engine, data mapping, and color scoring under specific scenarios without making live Gemini API calls:
+1. **Ideal Bluebird Day**: Low winds, clear skies, cold freezing level -> Green overall.
+2. **High Wind Hazard**: Over 30 mph winds at Peak -> Red Peak composite color.
+3. **Warm Freezing Level / Rockfall**: Freezing level way above Peak elevation -> Red freezing level verdict.
+4. **Rain on Snow / Wet Slide**: Drizzle or rain at temperatures above 32°F -> Red precipitation verdict.
+5. **Whiteout / Low Visibility**: Overcast cloud cover (>80%) and low visibility (<3000m) -> Red composite cell color.
 
-### 5. CLI Execution (`gonogo/cli.py`)
-- Updated the CLI to run the ADK pipeline using `Runner` and `InMemorySessionService`.
-- Parses the Advisor agent's markdown JSON block and outputs the results clearly to the console (sorted North-to-South).
+### 5. Documentation Updates (`README.md`)
+- Updated `README.md` to detail CLI usage (including date range parameters), testing, structured trace logging, and a dedicated **Future Work** section.
 
 ---
 
 ## Verification Results
 
-### Automated Tests
-We wrote unit and mock tests in [test_agents.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/tests/test_agents.py) using `unittest.mock` to verify the agents' internal logic, session state updates, and tool-calling execution paths without hitting the real Gemini API.
-
-We ran `make test` and all 17 tests passed cleanly:
+### 1. Automated Tests
+We executed the full test suite. All 22 tests (17 original + 5 new golden scenarios) passed successfully in 3.3 seconds:
 ```bash
 uv run pytest
-======================== 17 passed, 5 warnings in 3.11s ========================
+======================== 22 passed, 5 warnings in 3.30s ========================
 ```
-This includes:
-- 10 core weather fetch and rules tests.
-- 2 agent unit/mock tests (Orchestrator pipeline and ConditionsAgent).
-- 4 integration/E2E server streaming and feedback tests.
-- 1 dummy unit test.
+
+### 2. Manual Verification
+Running the CLI with real weather data (mocking the Gemini LLM responses) successfully generates the stacked tier tables and precipitation badges:
+```
+ 1. Mt. Baker / Shuksan Area (Headline Peak: Mt. Baker)
+    [Past 48h Precip: 0.0 mm]
+    Note: Excellent bluebird conditions expected at all tiers. Light wind and good visibility.
+
+    Tiers             | 2026-06-26 | 2026-06-27 | 2026-06-28 || Overall
+    ------------------+------------+------------+------------++---------
+    Peak (10781 ft)   |    ■ ■ ■   |    ■ ■ ■   |    ■ ■ ■   ||    ■    
+    Mid (6000 ft)     |    ■ ■ ■   |    ■ ■ ■   |    ■ ■ ■   ||    ■    
+    Base (3400 ft)    |    ■ ■ ■   |    ■ ■ ■   |    ■ ■ ■   ||    ■    
+```
+
+### 3. Trace Logging Output
+The run logs are written to `gonogo_runs.jsonl` correctly:
+```json
+{"timestamp": 1782447853.97297, "type": "agent", "name": "conditions_agent", "latency_sec": 2.20328, "status": "success", "summary": "Agent conditions_agent execution completed."}
+{"timestamp": 1782447853.981768, "type": "tool", "name": "load_skill", "latency_sec": 0.00002, "status": "success", "summary": "Tool load_skill invocation completed.", "args": {"skill_name": "mountaineering-conditions-skill"}}
+{"timestamp": 1782447853.98441, "type": "agent", "name": "advisor_agent", "latency_sec": 0.01019, "status": "success", "summary": "Agent advisor_agent execution completed."}
+{"timestamp": 1782447853.984511, "type": "agent", "name": "orchestrator_agent", "latency_sec": 2.21577, "status": "success", "summary": "Agent orchestrator_agent execution completed."}
+```

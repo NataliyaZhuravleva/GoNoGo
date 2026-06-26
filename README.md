@@ -25,21 +25,46 @@ The project uses `uv` for python virtual environment and package management.
 
 ## Running the CLI
 
-Run the deterministic conditions checker CLI for tomorrow's forecast (default) or specify a date:
+Run the multi-agent conditions checker CLI for tomorrow's forecast (default) or specify a custom date/range:
 ```bash
-# Run for default date
+# Run for tomorrow's date
 uv run python -m gonogo.cli
 
 # Run for a specific date (within next 7 days)
 uv run python -m gonogo.cli --date 2026-06-28
+
+# Run for a date range (up to 7 days)
+uv run python -m gonogo.cli --date 2026-06-28 --end-date 2026-06-30
+
+# Run without ANSI colors
+uv run python -m gonogo.cli --date 2026-06-28 --no-color
 ```
 
 ## Running Tests
 
-Run the unit tests:
+Run the complete test suite including unit, integration, and offline golden-set tests:
 ```bash
 make test
 ```
+
+## Structured Trace Logging
+
+Every execution of the CLI pipeline or agent runner is tracked by the `StructuredLoggingPlugin` and logged to `gonogo_runs.jsonl` in the root directory. Logs are formatted as JSON lines containing:
+- `timestamp`: Epoch time of execution.
+- `type`: Either `agent` or `tool`.
+- `name`: The name of the agent or tool executed.
+- `latency_sec`: The execution duration.
+- `status`: `success` or error status.
+- `summary`: Human-readable summary of the step.
+- `args`: Arguments passed to tools (for privacy, content payloads are summarized/truncated).
+
+## Future Work
+
+- **Web Application Dashboard**: Replace the CLI dashboard with a clean, modern browser-based interface utilizing React or Next.js.
+- **Trip Report Fetching**: Integrate tools to query real-time trip reports and trail conditions from WTA, AllTrails, and Mountain Project.
+- **Expanded Activity Support**: Support ice/rock climbing, backcountry skiing, and gravel biking, with tailored rules engines.
+- **Cross-session Memory**: Maintain a history of user queries and favorited regions across sessions.
+- **Cloud Deployment**: Package the application container for Cloud Run deployment and setup production telemetry.
 
 ## Copyright & Licensing
 

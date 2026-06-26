@@ -154,6 +154,16 @@ def fetch_conditions(
     """
     regions = load_regions_data()
     
+    # Scope Guardrail: Verify that only the authorized 12 region IDs are computed
+    allowed_ids = {
+        "baker_shuksan", "washington_pass", "stuart_enchantments", "glacier_peak",
+        "eldorado_cascade_pass", "rainier", "south_wa_volcanoes", "hood",
+        "jefferson_three_sisters", "mt_olympus", "eastern_olympics", "shasta"
+    }
+    loaded_ids = {r["region_id"] for r in regions}
+    if not loaded_ids.issubset(allowed_ids):
+        raise ValueError(f"Scope Guardrail Violation: Detected unauthorized region(s): {loaded_ids - allowed_ids}")
+    
     # Build 36 coordinate-elevation pairs
     # Keep track of mapping: index -> (region, tier_key, elevation_ft)
     query_mapping: List[Tuple[dict[str, Any], str, float]] = []

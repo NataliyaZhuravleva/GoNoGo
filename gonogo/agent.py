@@ -5,6 +5,7 @@ from google.adk.apps import App
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
+from gonogo.app_utils.telemetry import StructuredLoggingPlugin
 
 class MockRootAgent(BaseAgent):
     """Mock agent for integration testing to prevent live API calls and date parsing errors."""
@@ -33,4 +34,5 @@ else:
 app = App(
     root_agent=root_agent,
     name="gonogo",
+    plugins=[StructuredLoggingPlugin()],
 )

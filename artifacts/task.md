@@ -1,12 +1,13 @@
-# GoNoGo Phase 2 Task List
+# GoNoGo Phase 3 Task List
 
-- [x] Add `google-adk[gcp]` dependency to `pyproject.toml` and install
-- [x] Run `agents-cli scaffold enhance` to register as an ADK prototype project
-- [x] Create the `mountaineering-conditions-skill` directory and `SKILL.md`
-- [x] Implement `gonogo/agents.py` containing:
-  - `ConditionsAgent`: Deterministic, zero LLM calls, parses and validates weather response
-  - `AdvisorAgent`: LLM-based, loads the SkillToolset, generates batched regional notes and top recommendation in one LLM call
-  - `OrchestratorAgent`: BaseAgent orchestrating date validation, ConditionsAgent, and AdvisorAgent in sequence, then sorting north-to-south
-- [x] Update `gonogo/cli.py` to run the agent runner and print notes and recommendation
-- [x] Write unit/integration tests in `tests/test_agents.py` to verify the multi-agent pipeline
-- [x] Verify the pipeline runs and tests pass
+- [x] Implement three stacked tier-tables per region in `gonogo/cli.py`
+- [x] Add the Overall column per tier (worst color logic) in `gonogo/cli.py`
+- [x] Display the past 48h precipitation badge per region in `gonogo/cli.py`
+- [x] Implement defensive scope guardrail checks in `gonogo/core.py`
+- [x] Create the custom `StructuredLoggingPlugin` in `gonogo/app_utils/telemetry.py`
+- [x] Register the logging plugin in `gonogo/agent.py` and run pipelines
+- [x] Implement 3-5 offline golden-set scenarios in `tests/test_golden_set.py`
+- [x] Run the complete test suite (`make test`) and ensure all 22+ tests pass
+- [x] Perform manual verification of overall color logic and trace logging
+- [x] Update `README.md` and `SPEC.md` documentation
+- [x] Commit all changes to the Git repository

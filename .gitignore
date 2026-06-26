@@ -41,3 +41,6 @@ wheels/
 # ADK local files
 .adk/
 *.db
+
+# Run logs
+gonogo_runs.jsonl

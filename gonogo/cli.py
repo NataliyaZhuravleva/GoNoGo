@@ -14,6 +14,7 @@ from google.genai import types
 
 from gonogo.agents import OrchestratorAgent
 from gonogo.core import load_regions_data
+from gonogo.app_utils.telemetry import StructuredLoggingPlugin
 
 # Load environment variables (such as GOOGLE_API_KEY)
 load_dotenv()
@@ -23,6 +24,30 @@ COLOR_GREEN = "\033[92m"
 COLOR_YELLOW = "\033[93m"
 COLOR_RED = "\033[91m"
 COLOR_RESET = "\033[0m"
+
+def format_verdict(color: str, use_color: bool) -> str:
+    color_lower = color.lower()
+    if color_lower == "red":
+        return f"{COLOR_RED}■{COLOR_RESET}" if use_color else "[R]"
+    elif color_lower == "yellow":
+        return f"{COLOR_YELLOW}■{COLOR_RESET}" if use_color else "[Y]"
+    else:
+        return f"{COLOR_GREEN}■{COLOR_RESET}" if use_color else "[G]"
+
+def format_day_cell(m: str, d: str, e: str, use_color: bool) -> str:
+    if use_color:
+        return f"   {format_verdict(m, True)} {format_verdict(d, True)} {format_verdict(e, True)}   "
+    else:
+        vm = format_verdict(m, False)
+        vd = format_verdict(d, False)
+        ve = format_verdict(e, False)
+        return f" {vm}{vd}{ve} "
+
+def format_overall_cell(color: str, use_color: bool) -> str:
+    if use_color:
+        return f"||    {format_verdict(color, True)}    "
+    else:
+        return f"||   {format_verdict(color, False)}   "
 
 async def run_pipeline(start_date_str: str, end_date_str: str | None, use_color: bool):
     """Run the multi-agent Orchestrator pipeline and print results."""
@@ -49,7 +74,12 @@ async def run_pipeline(start_date_str: str, end_date_str: str | None, use_color:
     session_id = "session-default"
     await session_service.create_session(app_name="gonogo", user_id=user_id, session_id=session_id)
     
-    runner = Runner(agent=orchestrator, app_name="gonogo", session_service=session_service)
+    runner = Runner(
+        agent=orchestrator,
+        app_name="gonogo",
+        session_service=session_service,
+        plugins=[StructuredLoggingPlugin()]
+    )
     
     final_text = ""
     
@@ -122,12 +152,24 @@ async def run_pipeline(start_date_str: str, end_date_str: str | None, use_color:
     print(border)
     print()
     
+    # Load session state to retrieve forecast_data
+    session = await session_service.get_session(app_name="gonogo", user_id=user_id, session_id=session_id)
+    forecast_data = session.state.get("forecast_data") if session else None
+
     # Load and display regions sorted North-to-South
     regions = load_regions_data()
     for idx, reg in enumerate(regions, start=1):
         r_id = reg["region_id"]
         note = region_notes.get(r_id, "No note generated.")
         
+        # Find corresponding forecast data
+        reg_forecast = None
+        if forecast_data:
+            for f in forecast_data:
+                if f["region_id"] == r_id:
+                    reg_forecast = f
+                    break
+                    
         # Resolve headline peak name
         headline_name = ""
         for peak in reg["peaks"]:
@@ -138,9 +180,56 @@ async def run_pipeline(start_date_str: str, end_date_str: str | None, use_color:
             headline_name = reg["peaks"][0]["name"]
             
         print(f"{idx:2d}. {reg['name']} (Headline Peak: {headline_name})")
+        
+        if reg_forecast:
+            past_precip = reg_forecast.get("past_48h_precip_mm", 0.0)
+            print(f"    [Past 48h Precip: {past_precip:.1f} mm]")
+            
         print(f"    Note: {note}")
         print()
         
+        if reg_forecast and "tiers" in reg_forecast:
+            # Get dates from Peak tier
+            dates = []
+            peak_tier = reg_forecast["tiers"].get("peak")
+            if peak_tier and "forecast_days" in peak_tier:
+                dates = [d["date"] for d in peak_tier["forecast_days"]]
+                
+            if dates:
+                # Print Header
+                header_parts = ["    Tiers             "]
+                for dt in dates:
+                    header_parts.append(f"| {dt} ")
+                header_parts.append("|| Overall")
+                print("".join(header_parts))
+                
+                # Print Separator
+                separator_parts = ["    ------------------"]
+                for dt in dates:
+                    separator_parts.append("+------------")
+                separator_parts.append("++---------")
+                print("".join(separator_parts))
+                
+                # Print Tiers: Peak, Mid, Base
+                for tier_key, tier_label in [("peak", "Peak"), ("mid", "Mid"), ("base", "Base")]:
+                    tier_data = reg_forecast["tiers"].get(tier_key)
+                    if tier_data:
+                        elev_ft = tier_data.get("elevation_ft", 0.0)
+                        label = f"{tier_label} ({int(elev_ft)} ft)"
+                        row_parts = [f"    {label:<18}"]
+                        
+                        for day in tier_data.get("forecast_days", []):
+                            m = day["parts"]["morning"]["composite_color"]
+                            d = day["parts"]["midday"]["composite_color"]
+                            e = day["parts"]["evening"]["composite_color"]
+                            day_str = format_day_cell(m, d, e, use_color)
+                            row_parts.append(f"| {day_str}")
+                            
+                        overall_color = tier_data.get("composite_color", "Green")
+                        row_parts.append(format_overall_cell(overall_color, use_color))
+                        print("".join(row_parts))
+            print()
+            
     print(border)
 
 def main():
