@@ -1,120 +1,60 @@
-# Implementation Plan - GoNoGo (Phase 2: Agents and Skill)
+# Implementation Plan - GoNoGo (Phase 3.5: Remove Date Inputs & Default to 7-Day Week)
 
-This plan covers Phase 2 (Google ADK multi-agent integration and skill packaging) of the **GoNoGo** mountaineering conditions board.
+This plan covers removing user date inputs from both the CLI and web dashboard, defaulting to a static 7-day forecast starting tomorrow (clamped to Open-Meteo's reliable horizon), and updating the corresponding documentation.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> Please review the proposed multi-agent workflow, skill definition, and answer the open question below.
-
-## Open Questions
-
-1. **Gemini Model Choice**: Which model would you like the Advisor agent to use? We recommend using the standard stable alias `gemini-1.5-flash` or `gemini-2.5-flash` for fast, cost-conscious reasoning. We will default to `gemini-2.5-flash`.
-
----
-
-## Proposed Project Structure
-
-We will extend the project structure to include the ADK agents and skill package:
-
-```
-GoNoGo/
-├── .env.example
-├── .gitignore
-├── LICENSE
-├── Makefile
-├── pyproject.toml (updated dependencies)
-├── README.md
-├── SPEC.md
-├── data/
-│   └── regions.json
-├── src/
-│   └── gonogo/
-│       ├── __init__.py
-│       ├── cli.py             # CLI updated to run Orchestrator → Conditions → Advisor
-│       ├── core.py            # Headline-peak, date guardrails, weather fetcher
-│       ├── rules.py           # Pure deterministic color rule engine
-│       ├── utils.py           # Unit conversion, date parsing helpers
-│       ├── agents.py          # [NEW] OrchestratorAgent, ConditionsAgent, and AdvisorAgent definitions
-│       └── skills/            # [NEW] ADK Skill directory
-│           └── mountaineering-conditions-skill/
-│               └── SKILL.md   # [NEW] Domain knowledge for mountaineering weather interpretation
-└── tests/
-    ├── __init__.py
-    ├── test_core.py
-    ├── test_rules.py
-    └── test_agents.py         # [NEW] Unit/integration tests for the ADK agents pipeline
-```
-
----
+> - **CLI Arguments**: The `--date` and `--end-date` arguments will be removed from the CLI. Running `uv run python -m gonogo.cli` will always return the weekly conditions board.
+> - **Web Dashboard**: The date input fields will be removed from the controls card. A single "Refresh Conditions" button will be provided to trigger updates.
+> - **Backward Compatibility**: To keep existing tests (which pass specific dates to mock inputs) functional, the backend `OrchestratorAgent` will attempt to parse dates if they are provided, but default to the 7-day weekly forecast if they are missing or invalid.
 
 ## Proposed Changes
 
-### 1. Scaffolding Google ADK
-- Update `pyproject.toml` to include `google-adk[gcp]>=2.0.0,<3.0.0` under project dependencies.
-- Run the enhance command:
-  ```bash
-  agents-cli scaffold enhance . --agent-directory src/gonogo --prototype --google-api-key --auto-approve
-  ```
-  This creates the `.google-agents-cli` directory and `agents-cli-manifest.yaml`.
-- Run `make install` (`uv pip install -e .[dev]`) to install the newly added ADK library.
+### 1. Agents Logic (`gonogo/agents.py`)
+- Modify `OrchestratorAgent._run_async_impl` to check if a date range (YYYY-MM-DD) is specified in the user query.
+- If no date range is provided, default to:
+  - `start_date = date.today() + timedelta(days=1)` (tomorrow)
+  - `end_date = start_date + timedelta(days=6)` (7-day forecast range)
+- This ensures compatibility with unit/E2E test queries (which pass dates) while defaulting to the full week for the UI and CLI.
 
-### 2. Define Mountaineering Conditions Skill
-Create `src/gonogo/skills/mountaineering-conditions-skill/SKILL.md` containing:
-- YAML frontmatter with `name: mountaineering-conditions-skill` and a short description.
-- Detailed domain instructions outlining wind exposure speed thresholds, freezing level vs. elevation hazards (freeze-thaw and rockfall), precipitation types (rain vs. snow hazards), and navigation/whiteout risks.
+### 2. FastAPI Backend & Dashboard (`gonogo/fast_api_app.py`)
+- Update the `/api/report` endpoint to make `start_date` and `end_date` query parameters optional (`str | None = None`). If they are not supplied, default to the weekly range (tomorrow -> tomorrow + 6 days).
+- In `/dashboard` (the HTML template):
+  - Remove `<input type="date" id="start-date">` and `<input type="date" id="end-date">` from the DOM controls card.
+  - Set up a single button styled as `Refresh Conditions`.
+  - Update `loadReport()` JavaScript to call `/api/report` without date parameters, fetching the weekly data automatically.
 
-### 3. Implement ADK Multi-Agent System (`src/gonogo/agents.py`)
-We will implement three custom ADK agents using the ADK SDK:
+### 3. CLI Application (`gonogo/cli.py`)
+- Modify the arguments parser in `main()` to remove the `--date` and `--end-date` options.
+- Update `run_pipeline()` to call the orchestrator with an empty query (which triggers the 7-day default range).
+- The console tables output will dynamically adjust to print all 7 days of the forecast automatically.
 
-1. **ConditionsAgent** (deterministic `BaseAgent` subclass):
-   - Zero LLM calls.
-   - Reads the validated date range from the session state.
-   - Invokes Phase 1's `fetch_conditions(start_date, end_date)`.
-   - Performs a tool-injection guardrail check: validates that the response maps exactly to the expected JSON schema and Pydantic models (guaranteeing it contains only structured numerical/ISO data and no injection payloads).
-   - Writes the structured list of `RegionForecast` objects to `session.state["forecast_data"]`.
-
-2. **AdvisorAgent** (`Agent` / `LlmAgent` instance):
-   - LLM-backed (Gemini).
-   - Instantiated with the `SkillToolset` loaded from our local skill directory.
-   - System instruction directs the agent to evaluate the regions' weather conditions and color verdicts using the `mountaineering-conditions-skill`.
-   - Evaluates all 12 regions in **one single batched LLM call**.
-   - Outputs: a short condition note per region and a top-pick recommendation (storing them in `session.state`).
-
-3. **OrchestratorAgent** (custom `BaseAgent` wrapper):
-   - Acts as the root controller.
-   - Validates user input (start/end dates) using the guardrail.
-   - Invokes `ConditionsAgent` and then `AdvisorAgent` in sequence.
-   - Sorts the regional results north-to-south by latitude.
-   - Yields final events containing the structured forecast, region notes, and top recommendation.
-
-### 4. Update the CLI (`src/gonogo/cli.py`)
-- Modify `cli.py` to instantiate `OrchestratorAgent` and run it via the ADK `Runner` and `InMemorySessionService`.
-- Read the final response, print the top recommendation at the top, and print the 12 regions' agent-written notes sorted north-to-south.
-
-### 5. Write Tests for Agents (`tests/test_agents.py`)
-- Test the sequential execution of the agents.
-- Verify that `ConditionsAgent` correctly fetches weather data and stores it in session state.
-- Verify that `AdvisorAgent` is initialized with the `SkillToolset`.
+### 4. Documentation (`README.md` and `SPEC.md`)
+- Update `README.md` to remove instructions for specifying `--date` and `--end-date`.
+- Update `SPEC.md` to clarify that the application operates on a default 7-day weekly horizon and no longer accepts date range inputs.
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-Run:
+Run the test suite:
 ```bash
-make test
+uv run pytest
 ```
-This will run the new agent tests along with the core/rule engine tests.
+Verify that all 22 tests pass cleanly (including the `test_chat_stream` integration test which was previously failing due to date parsing requirements).
 
 ### Manual Verification
-Run the updated CLI:
-```bash
-uv run python -m gonogo.cli --date 2026-06-26
-```
-We will verify that:
-1. Orchestrator, Conditions, and Advisor agents are executed in sequence (confirmed via console outputs or logging).
-2. The Advisor's output (notes + top recommendation) is printed.
-3. The notes reflect the `mountaineering-conditions-skill` domain knowledge (e.g., highlighting freezing level elevation or wind exposure).
-4. Exactly one Gemini call is made by the Advisor, and zero Gemini calls are made by the Conditions agent.
+1. **CLI Run**:
+   Run the CLI:
+   ```bash
+   uv run python -m gonogo.cli
+   ```
+   Verify that it displays a 7-day conditions table (from tomorrow to tomorrow + 6 days) without requiring date inputs.
+2. **Web Dashboard**:
+   Run the server:
+   ```bash
+   uv run python -m gonogo.fast_api_app
+   ```
+   Verify that the date inputs are removed and clicking `Refresh Conditions` successfully fetches and displays the weekly conditions.

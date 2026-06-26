@@ -1,13 +1,7 @@
-# GoNoGo Phase 3 Task List
+# GoNoGo 7-Day Weekly Forecast Checklist
 
-- [x] Implement three stacked tier-tables per region in `gonogo/cli.py`
-- [x] Add the Overall column per tier (worst color logic) in `gonogo/cli.py`
-- [x] Display the past 48h precipitation badge per region in `gonogo/cli.py`
-- [x] Implement defensive scope guardrail checks in `gonogo/core.py`
-- [x] Create the custom `StructuredLoggingPlugin` in `gonogo/app_utils/telemetry.py`
-- [x] Register the logging plugin in `gonogo/agent.py` and run pipelines
-- [x] Implement 3-5 offline golden-set scenarios in `tests/test_golden_set.py`
-- [x] Run the complete test suite (`make test`) and ensure all 22+ tests pass
-- [x] Perform manual verification of overall color logic and trace logging
-- [x] Update `README.md` and `SPEC.md` documentation
-- [x] Commit all changes to the Git repository
+- [x] Implement 7-day range default logic in `OrchestratorAgent` (`gonogo/agents.py`)
+- [x] Update FastAPI backend and dashboard frontend to remove date inputs (`gonogo/fast_api_app.py`)
+- [x] Remove date arguments and update CLI (`gonogo/cli.py`)
+- [x] Update documentation (`README.md`, `SPEC.md`)
+- [x] Verify all tests pass (`uv run pytest`) and manually check dashboard/CLI
