@@ -17,7 +17,7 @@ from gonogo.core import load_regions_data
 from gonogo.app_utils.telemetry import StructuredLoggingPlugin
 
 # Load environment variables (such as GOOGLE_API_KEY)
-load_dotenv()
+load_dotenv(override=True)
 
 # ANSI Escape Colors
 COLOR_GREEN = "\033[92m"
