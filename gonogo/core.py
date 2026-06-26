@@ -48,7 +48,7 @@ class RegionForecast(BaseModel):
 def get_data_path() -> str:
     """Get the absolute path to regions.json."""
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    root_dir = os.path.abspath(os.path.join(current_dir, "..", ".."))
+    root_dir = os.path.abspath(os.path.join(current_dir, ".."))
     return os.path.join(root_dir, "data", "regions.json")
 
 def load_regions_data() -> list[dict[str, Any]]:

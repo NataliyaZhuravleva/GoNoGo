@@ -37,3 +37,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+ 
+# ADK local files
+.adk/
+*.db
