@@ -1,0 +1,193 @@
+[
+  {
+    "region_id": "baker_shuksan",
+    "name": "Mt. Baker / Shuksan Area",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "mt_baker", "name": "Mt. Baker", "is_headline": true, "coordinates": {"lat": 48.7768, "lon": -121.8144, "elev_ft": 10781}},
+      {"peak_id": "mt_shuksan", "name": "Mt. Shuksan", "coordinates": {"lat": 48.8245, "lon": -121.6034, "elev_ft": 9131}}
+    ],
+    "headline_peak_id": "mt_baker",
+    "tiers": {
+      "base": {"elev_ft": 3400, "source": "named_trailhead", "name": "Schriebers Meadow trailhead"},
+      "mid": {"elev_ft": 6000, "source": "named_camp", "name": "Sandy Camp / High Camp"},
+      "peak": {"elev_ft": 10781, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "washington_pass",
+    "name": "Washington Pass Area",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "liberty_bell", "name": "Liberty Bell Mountain", "coordinates": {"lat": 48.524, "lon": -120.645, "elev_ft": 7720}},
+      {"peak_id": "early_winters_spires", "name": "Early Winters Spires", "coordinates": {"lat": 48.518, "lon": -120.652, "elev_ft": 7776}},
+      {"peak_id": "silver_star", "name": "Silver Star Mountain", "is_headline": true, "coordinates": {"lat": 48.5479, "lon": -120.5845, "elev_ft": 8876}}
+    ],
+    "headline_peak_id": "silver_star",
+    "tiers": {
+      "base": {"elev_ft": 4250, "source": "named_trailhead", "name": "Burgundy Col climbers' pullout"},
+      "mid": {"elev_ft": 6563, "source": "midpoint"},
+      "peak": {"elev_ft": 8876, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "stuart_enchantments",
+    "name": "Stuart Range / Enchantments",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering", "rock_climbing"],
+    "peaks": [
+      {"peak_id": "mt_stuart", "name": "Mt. Stuart", "is_headline": true, "coordinates": {"lat": 47.4751, "lon": -120.9105, "elev_ft": 9415}},
+      {"peak_id": "dragontail_peak", "name": "Dragontail Peak", "coordinates": {"lat": 47.4608, "lon": -120.8312, "elev_ft": 8840}}
+    ],
+    "headline_peak_id": "mt_stuart",
+    "tiers": {
+      "base": {"elev_ft": 4300, "source": "named_trailhead", "name": "Esmeralda trailhead"},
+      "mid": {"elev_ft": 6858, "source": "midpoint"},
+      "peak": {"elev_ft": 9415, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "glacier_peak",
+    "name": "Glacier Peak",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "glacier_peak", "name": "Glacier Peak", "is_headline": true, "coordinates": {"lat": 48.1117, "lon": -121.1136, "elev_ft": 10541}}
+    ],
+    "headline_peak_id": "glacier_peak",
+    "tiers": {
+      "base": {"elev_ft": 2100, "source": "named_trailhead", "name": "North Fork Sauk River trailhead"},
+      "mid": {"elev_ft": 6321, "source": "midpoint"},
+      "peak": {"elev_ft": 10541, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "eldorado_cascade_pass",
+    "name": "Eldorado Peak / Cascade Pass",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "eldorado_peak", "name": "Eldorado Peak", "is_headline": true, "coordinates": {"lat": 48.5136, "lon": -121.1964, "elev_ft": 8868}}
+    ],
+    "headline_peak_id": "eldorado_peak",
+    "tiers": {
+      "base": {"elev_ft": 2100, "source": "named_trailhead", "name": "Eldorado Creek trailhead"},
+      "mid": {"elev_ft": 5484, "source": "midpoint"},
+      "peak": {"elev_ft": 8868, "source": "summit"}
+    },
+    "_future_peaks": ["Forbidden Peak", "Sahale Peak", "Boston Peak", "Mount Torment", "Mount Buckner"]
+  },
+  {
+    "region_id": "rainier",
+    "name": "Mt. Rainier",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "mt_rainier", "name": "Mt. Rainier", "is_headline": true, "coordinates": {"lat": 46.8523, "lon": -121.7603, "elev_ft": 14411}}
+    ],
+    "headline_peak_id": "mt_rainier",
+    "tiers": {
+      "base": {"elev_ft": 5420, "source": "named_trailhead", "name": "Paradise"},
+      "mid": {"elev_ft": 10188, "source": "named_camp", "name": "Camp Muir"},
+      "peak": {"elev_ft": 14411, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "south_wa_volcanoes",
+    "name": "South WA Volcanoes",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "mt_st_helens", "name": "Mt. St. Helens", "coordinates": {"lat": 46.1912, "lon": -122.1944, "elev_ft": 8363}},
+      {"peak_id": "mt_adams", "name": "Mt. Adams", "is_headline": true, "coordinates": {"lat": 46.2024, "lon": -121.4906, "elev_ft": 12276}}
+    ],
+    "headline_peak_id": "mt_adams",
+    "tiers": {
+      "base": {"elev_ft": 5570, "source": "named_trailhead", "name": "Cold Springs"},
+      "mid": {"elev_ft": 9281, "source": "named_camp", "name": "Lunch Counter"},
+      "peak": {"elev_ft": 12276, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "hood",
+    "name": "Mt. Hood",
+    "state": "OR", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "mt_hood", "name": "Mt. Hood", "is_headline": true, "coordinates": {"lat": 45.3736, "lon": -121.6960, "elev_ft": 11250}}
+    ],
+    "headline_peak_id": "mt_hood",
+    "tiers": {
+      "base": {"elev_ft": 5900, "source": "named_trailhead", "name": "Timberline Lodge"},
+      "mid": {"elev_ft": 9000, "source": "named_camp", "name": "Camp above Palmer lift"},
+      "peak": {"elev_ft": 11250, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "jefferson_three_sisters",
+    "name": "Mt. Jefferson / Three Sisters",
+    "state": "OR", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "mt_jefferson", "name": "Mt. Jefferson", "is_headline": true, "coordinates": {"lat": 44.6742, "lon": -121.7958, "elev_ft": 10497}},
+      {"peak_id": "south_sister", "name": "South Sister", "coordinates": {"lat": 44.1027, "lon": -121.7691, "elev_ft": 10358}},
+      {"peak_id": "middle_sister", "name": "Middle Sister", "coordinates": {"lat": 44.1500, "lon": -121.7958, "elev_ft": 10047}},
+      {"peak_id": "north_sister", "name": "North Sister", "coordinates": {"lat": 44.1683, "lon": -121.7728, "elev_ft": 10085}},
+      {"peak_id": "broken_top", "name": "Broken Top", "coordinates": {"lat": 44.0833, "lon": -121.6967, "elev_ft": 9175}}
+    ],
+    "headline_peak_id": "mt_jefferson",
+    "tiers": {
+      "base": {"elev_ft": 4100, "source": "named_trailhead", "name": "Whitewater trailhead"},
+      "mid": {"elev_ft": 7299, "source": "midpoint"},
+      "peak": {"elev_ft": 10497, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "mt_olympus",
+    "name": "Mt. Olympus (Olympics)",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "mt_olympus", "name": "Mt. Olympus", "is_headline": true, "coordinates": {"lat": 47.8013, "lon": -123.7108, "elev_ft": 7980}}
+    ],
+    "headline_peak_id": "mt_olympus",
+    "tiers": {
+      "base": {"elev_ft": 600, "source": "named_trailhead", "name": "Hoh River trailhead"},
+      "mid": {"elev_ft": 4290, "source": "midpoint"},
+      "peak": {"elev_ft": 7980, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "eastern_olympics",
+    "name": "Eastern Olympics (Ellinor/Washington)",
+    "state": "WA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "mt_ellinor", "name": "Mt. Ellinor", "coordinates": {"lat": 47.5066, "lon": -123.2321, "elev_ft": 5944}},
+      {"peak_id": "mt_washington_olympics", "name": "Mt. Washington (Olympics)", "is_headline": true, "coordinates": {"lat": 47.49, "lon": -123.22, "elev_ft": 6260}}
+    ],
+    "headline_peak_id": "mt_washington_olympics",
+    "tiers": {
+      "base": {"elev_ft": 3091, "source": "named_trailhead", "name": "Mt. Washington trailhead"},
+      "mid": {"elev_ft": 4676, "source": "midpoint"},
+      "peak": {"elev_ft": 6260, "source": "summit"}
+    }
+  },
+  {
+    "region_id": "shasta",
+    "name": "Mt. Shasta",
+    "state": "CA", "country": "US",
+    "activity_tags": ["mountaineering"],
+    "peaks": [
+      {"peak_id": "mt_shasta", "name": "Mt. Shasta", "is_headline": true, "coordinates": {"lat": 41.4092, "lon": -122.1949, "elev_ft": 14179}}
+    ],
+    "headline_peak_id": "mt_shasta",
+    "tiers": {
+      "base": {"elev_ft": 6950, "source": "named_trailhead", "name": "Bunny Flat"},
+      "mid": {"elev_ft": 10400, "source": "named_camp", "name": "Helen Lake"},
+      "peak": {"elev_ft": 14179, "source": "summit"}
+    }
+  }
+]
