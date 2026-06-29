@@ -76,6 +76,11 @@ app: FastAPI = get_fast_api_app(
 app.title = "gonogo"
 app.description = "API for interacting with the Agent gonogo"
 
+# In-memory TTL cache for /api/report, keyed by (start_date, end_date).
+# Avoids re-running the LLM pipeline on every page refresh.
+REPORT_CACHE_TTL_SECONDS = 3600
+_report_cache: dict[tuple[str, str | None], tuple[float, dict]] = {}
+
 
 @app.post("/feedback")
 def collect_feedback(feedback: Feedback) -> dict[str, str]:
@@ -93,22 +98,36 @@ def collect_feedback(feedback: Feedback) -> dict[str, str]:
 
 @app.get("/api/report")
 async def get_report(start_date: str | None = None, end_date: str | None = None):
-    """Run the multi-agent Orchestrator pipeline and return the report in JSON format."""
+    """Run the multi-agent Orchestrator pipeline and return the report in JSON format.
+
+    Results are cached in-memory per (start_date, end_date) for
+    REPORT_CACHE_TTL_SECONDS, so page refreshes within the TTL window
+    don't trigger a new LLM pipeline run.
+    """
+    import time
+    from datetime import date, timedelta
+
+    if not start_date:
+        today = date.today()
+        start_date = (today + timedelta(days=1)).isoformat()
+        end_date = (today + timedelta(days=7)).isoformat()
+
+    cache_key = (start_date, end_date)
+    cached = _report_cache.get(cache_key)
+    if cached is not None:
+        cached_at, cached_response = cached
+        if time.time() - cached_at < REPORT_CACHE_TTL_SECONDS:
+            return cached_response
+
     try:
         import json
         import re
-        from datetime import date, timedelta
 
         from google.adk.runners import Runner
         from google.adk.sessions import InMemorySessionService
         from google.genai import types
 
         from gonogo.agents import OrchestratorAgent
-
-        if not start_date:
-            today = date.today()
-            start_date = (today + timedelta(days=1)).isoformat()
-            end_date = (today + timedelta(days=7)).isoformat()
 
         orchestrator = OrchestratorAgent()
         session_service = InMemorySessionService()
@@ -164,12 +183,14 @@ async def get_report(start_date: str | None = None, end_date: str | None = None)
         )
         forecast_data = session.state.get("forecast_data") if session else None
 
-        return {
+        response = {
             "status": "success",
             "top_recommendation": report_data.get("top_recommendation"),
             "region_notes": report_data.get("region_notes"),
             "forecasts": forecast_data,
         }
+        _report_cache[cache_key] = (time.time(), response)
+        return response
     except Exception as e:
         import traceback
 
