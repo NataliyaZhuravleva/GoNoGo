@@ -196,7 +196,7 @@ def serve_dashboard():
                 radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.04) 0px, transparent 50%);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 3rem 1.5rem;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -210,22 +210,22 @@ def serve_dashboard():
         /* Header */
         header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 0.75rem;
         }
 
         h1 {
-            font-size: 2.75rem;
+            font-size: 1.75rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), #d946ef);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.04em;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.03em;
         }
 
         header p {
             color: var(--text-secondary);
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 300;
         }
 
@@ -234,7 +234,7 @@ def serve_dashboard():
             background: transparent;
             border: none;
             padding: 0;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             display: flex;
             justify-content: center;
             box-shadow: none;
@@ -243,24 +243,24 @@ def serve_dashboard():
         .btn-submit {
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
             border: none;
-            border-radius: 16px;
-            padding: 0.35rem 1.25rem;
+            border-radius: 12px;
+            padding: 0.25rem 0.75rem;
             color: white;
             font-family: inherit;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            height: 32px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.15);
         }
 
         .btn-submit:hover {
             transform: translateY(-1px);
-            box-shadow: 0 8px 12px -3px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 6px 10px -3px rgba(37, 99, 235, 0.25);
         }
 
         .btn-submit:active {
@@ -273,9 +273,9 @@ def serve_dashboard():
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(79, 70, 229, 0.15);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 3rem;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
             box-shadow: var(--shadow-glow);
             display: none;
             animation: slideUp 0.5s ease-out;
@@ -284,16 +284,16 @@ def serve_dashboard():
         .rec-header {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             font-weight: 700;
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
             color: var(--accent-primary);
         }
 
         .rec-text {
-            font-size: 1.1rem;
-            line-height: 1.6;
+            font-size: 1rem;
+            line-height: 1.5;
             color: var(--text-primary);
             font-weight: 400;
         }
@@ -302,25 +302,25 @@ def serve_dashboard():
         .regions-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 2.5rem;
+            gap: 1.5rem;
         }
 
         .region-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
+            border-radius: 12px;
+            padding: 1.25rem;
             box-shadow: var(--shadow-card);
             transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             animation: fadeIn 0.5s ease-out;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .region-card:hover {
             border-color: var(--card-hover-border);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             box-shadow: var(--shadow-hover);
         }
 
@@ -329,9 +329,9 @@ def serve_dashboard():
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.75rem;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
+            padding-bottom: 0.75rem;
         }
 
         .region-title-area {
@@ -341,13 +341,13 @@ def serve_dashboard():
         }
 
         .region-name {
-            font-size: 1.6rem;
+            font-size: 1.35rem;
             font-weight: 700;
             color: var(--text-primary);
         }
 
         .region-meta {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
         }
 
@@ -356,28 +356,28 @@ def serve_dashboard():
             border: 1px solid rgba(37, 99, 235, 0.15);
             color: var(--accent-primary);
             border-radius: 99px;
-            padding: 0.35rem 0.85rem;
-            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.3rem;
         }
 
         .region-note {
             background: rgba(0, 0, 0, 0.015);
             border-left: 4px solid var(--accent-primary);
-            padding: 1rem 1.25rem;
+            padding: 0.75rem 1rem;
             border-radius: 4px;
-            font-size: 1rem;
-            line-height: 1.5;
+            font-size: 0.95rem;
+            line-height: 1.4;
             color: #334155;
         }
 
         /* 3-Tier Tables */
         .table-container {
             overflow-x: auto;
-            border-radius: 12px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
             background: #ffffff;
         }
@@ -386,12 +386,12 @@ def serve_dashboard():
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             min-width: 800px;
         }
 
         th, td {
-            padding: 0.5rem 0.5rem;
+            padding: 0.4rem 0.4rem;
             border-bottom: 1px solid var(--border-color);
         }
 
@@ -400,7 +400,7 @@ def serve_dashboard():
             color: var(--text-secondary);
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             letter-spacing: 0.05em;
         }
 
@@ -408,7 +408,8 @@ def serve_dashboard():
             font-weight: 600;
             color: var(--text-primary);
             background: #f8fafc;
-            border-right: 1px solid var(--border-color);
+            border-right: 2px solid var(--border-color);
+            font-size: 0.8rem;
         }
 
         /* Day part rendering */
@@ -613,21 +614,24 @@ def serve_dashboard():
                         const datesList = peakTier ? peakTier.forecast_days.map(d => d.date) : [];
 
                         // Build Table Header
-                        let headerRow1 = `<th rowspan="2" style="vertical-align: middle;">Tiers</th>`;
+                        let headerRow1 = `<th rowspan="3" style="vertical-align: middle; border-right: 2px solid var(--border-color);">Tiers</th>`;
                         let headerRow2 = ``;
+                        let headerRow3 = ``;
                         
                         datesList.forEach(dt => {
-                            // format date to MM/DD
                             const parts = dt.split("-");
-                            const formattedDate = `${parts[1]}/${parts[2]}`;
-                            headerRow1 += `<th colspan="3" style="text-align: center; border-bottom: 1px solid var(--border-color);">${formattedDate}</th>`;
-                            headerRow2 += `
-                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">M</th>
-                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">D</th>
-                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">E</th>
+                            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                            const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+                            const dayOfMonth = parts[2];
+                            
+                            headerRow1 += `<th colspan="3" style="text-align: center; border-right: 2px solid var(--border-color);">${dayOfWeek}</th>`;
+                            headerRow2 += `<th colspan="3" style="text-align: center; border-bottom: 1px solid var(--border-color); border-right: 2px solid var(--border-color); font-size: 0.8rem; font-weight: 500;">${dayOfMonth}</th>`;
+                            headerRow3 += `
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">AM</th>
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">PM</th>
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem; border-right: 2px solid var(--border-color);">Night</th>
                             `;
                         });
-                        headerRow1 += `<th rowspan="2" style="text-align: center; vertical-align: middle; border-left: 1px solid var(--border-color);">Overall</th>`;
 
                         // Build Table Rows (Peak, Mid, Base)
                         let tableRows = "";
@@ -648,29 +652,22 @@ def serve_dashboard():
                                 const e = day.parts.evening;
 
                                 cells += `
-                                    <td style="text-align: center; padding: 0.5rem 0.25rem;">
-                                        <span class="dot-cell ${colorClassMap[m.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Morning: ${m.composite_color} - ${m.wind.reason}"></span>
+                                    <td style="text-align: center; padding: 0.4rem 0.25rem;">
+                                        <span class="dot-cell ${colorClassMap[m.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="AM (4am-12pm): ${m.composite_color} - ${m.wind.reason}"></span>
                                     </td>
-                                    <td style="text-align: center; padding: 0.5rem 0.25rem;">
-                                        <span class="dot-cell ${colorClassMap[d.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Midday: ${d.composite_color} - ${d.precipitation.reason}"></span>
+                                    <td style="text-align: center; padding: 0.4rem 0.25rem;">
+                                        <span class="dot-cell ${colorClassMap[d.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="PM (12pm-8pm): ${d.composite_color} - ${d.precipitation.reason}"></span>
                                     </td>
-                                    <td style="text-align: center; padding: 0.5rem 0.25rem;">
-                                        <span class="dot-cell ${colorClassMap[e.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Evening: ${e.composite_color} - ${e.visibility.reason}"></span>
+                                    <td style="text-align: center; padding: 0.4rem 0.25rem; border-right: 2px solid var(--border-color);">
+                                        <span class="dot-cell ${colorClassMap[e.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Night (8pm-4am): ${e.composite_color} - ${e.visibility.reason}"></span>
                                     </td>
                                 `;
                             });
-
-                            const overallColor = tierData.composite_color.toLowerCase();
-                            const overallClass = colorClassMap[overallColor] || "bg-red";
-                            const overallText = getColorAbbr(overallColor);
 
                             tableRows += `
                                 <tr>
                                     <td class="tier-label">${tierObj.label}</td>
                                     ${cells}
-                                    <td style="text-align: center; border-left: 1px solid var(--border-color);">
-                                        <span class="overall-badge ${overallClass}">${overallText}</span>
-                                    </td>
                                 </tr>
                             `;
                         });
@@ -693,6 +690,7 @@ def serve_dashboard():
                                     <thead>
                                         <tr>${headerRow1}</tr>
                                         <tr>${headerRow2}</tr>
+                                        <tr>${headerRow3}</tr>
                                     </thead>
                                     <tbody>
                                         ${tableRows}

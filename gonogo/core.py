@@ -260,9 +260,9 @@ def fetch_conditions(
         tier_colors: List[str] = []
         
         for d in date_list:
-            # Fetch for morning (06:00), midday (12:00), evening (18:00) local time
+            # Fetch for AM (08:00), PM (14:00), Night (22:00) local time
             day_verdicts = {}
-            for part, hour in [("morning", 6), ("midday", 12), ("evening", 18)]:
+            for part, hour in [("morning", 8), ("midday", 14), ("evening", 22)]:
                 target_str = f"{d.isoformat()}T{hour:02d}:00"
                 try:
                     t_idx = times.index(target_str)
