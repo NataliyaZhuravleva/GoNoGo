@@ -1,5 +1,5 @@
 # © 2026 Nataliya Zhuravleva. All rights reserved.
-from typing import TypedDict
+from typing_extensions import TypedDict
 
 
 class MetricVerdict(TypedDict):
