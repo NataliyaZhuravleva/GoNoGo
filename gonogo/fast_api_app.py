@@ -552,6 +552,12 @@ def serve_dashboard():
             const recText = document.getElementById("recommendation-text");
             const regionsContainer = document.getElementById("regions-container");
 
+            const escapeHtml = (str) => {
+                const div = document.createElement("div");
+                div.textContent = str;
+                return div.innerHTML;
+            };
+
             const colorClassMap = {
                 "green": "bg-green",
                 "yellow": "bg-yellow",
@@ -616,7 +622,7 @@ def serve_dashboard():
 
                     // Render Regions
                     data.forecasts.forEach(reg => {
-                        const note = data.region_notes[reg.region_id] || "No note generated.";
+                        const note = escapeHtml(data.region_notes[reg.region_id] || "No note generated.");
                         const card = document.createElement("div");
                         card.className = "region-card";
 
@@ -686,8 +692,8 @@ def serve_dashboard():
                         card.innerHTML = `
                             <div class="region-header">
                                 <div class="region-title-area">
-                                    <div class="region-name">${reg.headline_peak_name}</div>
-                                    <div class="region-meta">${reg.region_name}</div>
+                                    <div class="region-name">${escapeHtml(reg.headline_peak_name)}</div>
+                                    <div class="region-meta">${escapeHtml(reg.region_name)}</div>
                                 </div>
                             </div>
                             <div class="region-note">

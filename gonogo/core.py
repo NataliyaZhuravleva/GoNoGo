@@ -295,7 +295,11 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
                         if gusts_kmh is not None and gusts_kmh[t_idx] is not None
                         else None
                     )
-                    w_mph = max(sustained_mph, gust_mph) if gust_mph is not None else sustained_mph
+                    w_mph = (
+                        max(sustained_mph, gust_mph)
+                        if gust_mph is not None
+                        else sustained_mph
+                    )
                     is_gust = gust_mph is not None and gust_mph > sustained_mph
                     cloud_pct = clouds[t_idx]
                     vis_m = visibilities[t_idx]
