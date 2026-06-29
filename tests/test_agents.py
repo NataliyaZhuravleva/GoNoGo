@@ -10,7 +10,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
-from gonogo.agents import AdvisorAgentFactory, ConditionsAgent, OrchestratorAgent
+from gonogo.agents import ConditionsAgent, OrchestratorAgent
 from gonogo.core import DailyForecast, DayParts, RegionForecast, TierForecast
 
 
@@ -22,7 +22,7 @@ def mock_region_forecast():
         "precipitation": {"color": "Green", "reason": "No precip"},
         "freezing_level": {"color": "Green", "reason": "Cold"},
         "visibility": {"color": "Green", "reason": "Clear"},
-        "cloud_cover": {"color": "Green", "reason": "Clear"}
+        "cloud_cover": {"color": "Green", "reason": "Clear"},
     }
     return RegionForecast(
         region_id="baker_shuksan",
@@ -41,11 +41,11 @@ def mock_region_forecast():
                         parts=DayParts(
                             morning=mock_verdict,
                             midday=mock_verdict,
-                            evening=mock_verdict
-                        )
+                            evening=mock_verdict,
+                        ),
                     )
                 ],
-                composite_color="Green"
+                composite_color="Green",
             ),
             "mid": TierForecast(
                 tier_name="Mid",
@@ -56,11 +56,11 @@ def mock_region_forecast():
                         parts=DayParts(
                             morning=mock_verdict,
                             midday=mock_verdict,
-                            evening=mock_verdict
-                        )
+                            evening=mock_verdict,
+                        ),
                     )
                 ],
-                composite_color="Green"
+                composite_color="Green",
             ),
             "peak": TierForecast(
                 tier_name="Peak",
@@ -71,13 +71,13 @@ def mock_region_forecast():
                         parts=DayParts(
                             morning=mock_verdict,
                             midday=mock_verdict,
-                            evening=mock_verdict
-                        )
+                            evening=mock_verdict,
+                        ),
                     )
                 ],
-                composite_color="Green"
-            )
-        }
+                composite_color="Green",
+            ),
+        },
     )
 
 
@@ -116,20 +116,24 @@ async def test_orchestrator_pipeline(mock_region_forecast):
 
     orchestrator = OrchestratorAgent()
     session_service = InMemorySessionService()
-    await session_service.create_session(app_name="gonogo", user_id="user-1", session_id="sess-1")
+    await session_service.create_session(
+        app_name="gonogo", user_id="user-1", session_id="sess-1"
+    )
 
-    runner = Runner(agent=orchestrator, app_name="gonogo", session_service=session_service)
+    runner = Runner(
+        agent=orchestrator, app_name="gonogo", session_service=session_service
+    )
 
     mock_llm_response = {
         "top_recommendation": "Snoqualmie Pass has the best composite weather conditions.",
         "region_notes": {
             "baker_shuksan": "Warm temps and clear skies.",
-            "washington_pass": "Windy evening forecast."
-        }
+            "washington_pass": "Windy evening forecast.",
+        },
     }
 
     # Mock the Client to return a mock response for LLM generate_content
-    # Advisor agent runs in two steps: 
+    # Advisor agent runs in two steps:
     # 1st step: yields function call for load_skill
     # 2nd step: returns the markdown JSON code block
     async def mock_generate_content(*args, **kwargs):
@@ -140,7 +144,7 @@ async def test_orchestrator_pipeline(mock_region_forecast):
                 if part.function_response:
                     has_tool_response = True
                     break
-        
+
         if not has_tool_response:
             return types.GenerateContentResponse(
                 candidates=[
@@ -151,10 +155,12 @@ async def test_orchestrator_pipeline(mock_region_forecast):
                                 types.Part(
                                     function_call=types.FunctionCall(
                                         name="load_skill",
-                                        args={"skill_name": "mountaineering-conditions-skill"}
+                                        args={
+                                            "skill_name": "mountaineering-conditions-skill"
+                                        },
                                     )
                                 )
-                            ]
+                            ],
                         )
                     )
                 ]
@@ -169,7 +175,7 @@ async def test_orchestrator_pipeline(mock_region_forecast):
                                 types.Part.from_text(
                                     text=f"```json\n{json.dumps(mock_llm_response)}\n```"
                                 )
-                            ]
+                            ],
                         )
                     )
                 ]
@@ -181,16 +187,22 @@ async def test_orchestrator_pipeline(mock_region_forecast):
         yield response
 
     from unittest.mock import PropertyMock
+
     mock_client = MagicMock()
-    mock_client.aio.models.generate_content = AsyncMock(side_effect=mock_generate_content)
+    mock_client.aio.models.generate_content = AsyncMock(
+        side_effect=mock_generate_content
+    )
     mock_client.aio.models.generate_content_stream = mock_generate_content_stream
 
-    with patch("gonogo.agents.fetch_conditions") as mock_fetch, \
-         patch("google.adk.models.google_llm.Gemini.api_client", new_callable=PropertyMock) as mock_api_client_prop:
-        
+    with (
+        patch("gonogo.agents.fetch_conditions") as mock_fetch,
+        patch(
+            "google.adk.models.google_llm.Gemini.api_client", new_callable=PropertyMock
+        ) as mock_api_client_prop,
+    ):
         mock_api_client_prop.return_value = mock_client
         mock_fetch.return_value = [mock_region_forecast]
-        
+
         # Run orchestrator pipeline with a valid range
         events = []
         tomorrow = (date.today() + timedelta(days=1)).isoformat()
@@ -198,12 +210,17 @@ async def test_orchestrator_pipeline(mock_region_forecast):
         async for event in runner.run_async(
             user_id="user-1",
             session_id="sess-1",
-            new_message=types.Content(role="user", parts=[types.Part.from_text(text=f"{tomorrow} to {day_after}")])
+            new_message=types.Content(
+                role="user",
+                parts=[types.Part.from_text(text=f"{tomorrow} to {day_after}")],
+            ),
         ):
             events.append(event)
 
         assert len(events) > 0
-        
+
         # Verify conditions were fetched and stored
-        session = await session_service.get_session(app_name="gonogo", user_id="user-1", session_id="sess-1")
+        session = await session_service.get_session(
+            app_name="gonogo", user_id="user-1", session_id="sess-1"
+        )
         assert "forecast_data" in session.state

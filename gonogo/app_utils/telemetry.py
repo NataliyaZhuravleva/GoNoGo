@@ -12,8 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import os
+import time
+from typing import Any
+
+from google.adk.agents.base_agent import BaseAgent
+from google.adk.agents.callback_context import CallbackContext
+from google.adk.plugins.base_plugin import BasePlugin
+from google.adk.tools.base_tool import BaseTool
+from google.adk.tools.tool_context import ToolContext
 
 
 def setup_telemetry() -> str | None:
@@ -51,18 +60,9 @@ def setup_telemetry() -> str | None:
     return bucket
 
 
-import time
-import json
-from typing import Any
-from google.adk.plugins.base_plugin import BasePlugin
-from google.adk.agents.base_agent import BaseAgent
-from google.adk.tools.base_tool import BaseTool
-from google.adk.tools.tool_context import ToolContext
-from google.adk.agents.callback_context import CallbackContext
-
 class StructuredLoggingPlugin(BasePlugin):
     """Custom ADK Plugin that records agent and tool execution step traces to a JSONL file."""
-    
+
     def __init__(self, log_path: str = "gonogo_runs.jsonl"):
         super().__init__(name="structured_logging")
         self.log_path = log_path
@@ -89,14 +89,14 @@ class StructuredLoggingPlugin(BasePlugin):
         inv_id = callback_context.invocation_id
         start_time = self._start_times.pop((inv_id, agent.name), None)
         latency = time.perf_counter() - start_time if start_time else 0.0
-        
+
         record = {
             "timestamp": time.time(),
             "type": "agent",
             "name": agent.name,
             "latency_sec": latency,
             "status": "success",
-            "summary": f"Agent {agent.name} execution completed."
+            "summary": f"Agent {agent.name} execution completed.",
         }
         self._write_log(record)
         return None
@@ -110,12 +110,17 @@ class StructuredLoggingPlugin(BasePlugin):
         return None
 
     async def after_tool_callback(
-        self, *, tool: BaseTool, tool_args: dict[str, Any], tool_context: ToolContext, result: dict
+        self,
+        *,
+        tool: BaseTool,
+        tool_args: dict[str, Any],
+        tool_context: ToolContext,
+        result: dict,
     ) -> None:
         inv_id = tool_context.invocation_id
         start_time = self._start_times.pop((inv_id, tool.name), None)
         latency = time.perf_counter() - start_time if start_time else 0.0
-        
+
         # Avoid logging potentially huge binary/payload content, keep it clean
         args_summary = {k: str(v)[:100] for k, v in tool_args.items()}
         record = {
@@ -125,7 +130,7 @@ class StructuredLoggingPlugin(BasePlugin):
             "latency_sec": latency,
             "status": "success",
             "summary": f"Tool {tool.name} invocation completed.",
-            "args": args_summary
+            "args": args_summary,
         }
         self._write_log(record)
         return None

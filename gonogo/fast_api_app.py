@@ -11,39 +11,46 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 import logging as std_logging
+import os
 
 from dotenv import load_dotenv
+
 load_dotenv(override=True)
 
-import google.auth
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
-from google.adk.cli.fast_api import get_fast_api_app
+import google.auth  # noqa: E402
+from fastapi import FastAPI  # noqa: E402
+from fastapi.responses import HTMLResponse  # noqa: E402
+from google.adk.cli.fast_api import get_fast_api_app  # noqa: E402
 
-from gonogo.app_utils.telemetry import setup_telemetry
-from gonogo.app_utils.typing import Feedback
+from gonogo.app_utils.telemetry import setup_telemetry  # noqa: E402
+from gonogo.app_utils.typing import Feedback  # noqa: E402
 
 setup_telemetry()
+
 
 # Fallback logger for local / testing environments
 class FallbackLogger:
     def __init__(self, name):
         self.name = name
+
     def log_struct(self, data: dict, severity: str = "INFO"):
         std_logging.info(f"[{severity}] Struct log: {data}")
+
 
 # Attempt to load Google Cloud Logging, fallback to stdout logger if unavailable
 try:
     if os.environ.get("INTEGRATION_TEST") == "TRUE":
         raise RuntimeError("Forced fallback for integration testing")
     from google.cloud import logging as google_cloud_logging
+
     _, project_id = google.auth.default()
     logging_client = google_cloud_logging.Client()
     logger = logging_client.logger(__name__)
 except Exception as e:
-    std_logging.warning(f"Google Cloud Logging initialization failed, using fallback: {e}")
+    std_logging.warning(
+        f"Google Cloud Logging initialization failed, using fallback: {e}"
+    )
     logger = FallbackLogger(__name__)
 allow_origins = (
     os.getenv("ALLOW_ORIGINS", "").split(",") if os.getenv("ALLOW_ORIGINS") else None
@@ -88,69 +95,84 @@ def collect_feedback(feedback: Feedback) -> dict[str, str]:
 async def get_report(start_date: str | None = None, end_date: str | None = None):
     """Run the multi-agent Orchestrator pipeline and return the report in JSON format."""
     try:
+        import json
+        import re
         from datetime import date, timedelta
-        from gonogo.agents import OrchestratorAgent
+
         from google.adk.runners import Runner
         from google.adk.sessions import InMemorySessionService
         from google.genai import types
-        import re
-        import json
-        
+
+        from gonogo.agents import OrchestratorAgent
+
         if not start_date:
             today = date.today()
             start_date = (today + timedelta(days=1)).isoformat()
             end_date = (today + timedelta(days=7)).isoformat()
-            
+
         orchestrator = OrchestratorAgent()
         session_service = InMemorySessionService()
         user_id = "web-user"
         session_id = f"web-session-{start_date}"
-        await session_service.create_session(app_name="gonogo", user_id=user_id, session_id=session_id)
-        
+        await session_service.create_session(
+            app_name="gonogo", user_id=user_id, session_id=session_id
+        )
+
         # We pass the StructuredLoggingPlugin as well so web runs are also logged
         from gonogo.app_utils.telemetry import StructuredLoggingPlugin
+
         runner = Runner(
             agent=orchestrator,
             app_name="gonogo",
             session_service=session_service,
-            plugins=[StructuredLoggingPlugin()]
+            plugins=[StructuredLoggingPlugin()],
         )
-        
+
         query = start_date
         if end_date:
             query += f" to {end_date}"
-            
+
         final_text = ""
         async for event in runner.run_async(
             user_id=user_id,
             session_id=session_id,
-            new_message=types.Content(role="user", parts=[types.Part.from_text(text=query)])
+            new_message=types.Content(
+                role="user", parts=[types.Part.from_text(text=query)]
+            ),
         ):
-            if event.author == "advisor_agent" and event.is_final_response() and event.content and event.content.parts:
+            if (
+                event.author == "advisor_agent"
+                and event.is_final_response()
+                and event.content
+                and event.content.parts
+            ):
                 final_text = event.content.parts[0].text
-                
+
         if not final_text:
             raise ValueError("Advisor failed to produce a final response.")
-            
+
         json_content = final_text.strip()
         match = re.search(r"```json\s*(.*?)\s*```", final_text, re.DOTALL)
         if match:
             json_content = match.group(1).strip()
-            
+
         report_data = json.loads(json_content)
-        
+
         # Load session state to retrieve forecast_data
-        session = await session_service.get_session(app_name="gonogo", user_id=user_id, session_id=session_id)
+        session = await session_service.get_session(
+            app_name="gonogo", user_id=user_id, session_id=session_id
+        )
         forecast_data = session.state.get("forecast_data") if session else None
-        
+
         return {
             "status": "success",
             "top_recommendation": report_data.get("top_recommendation"),
             "region_notes": report_data.get("region_notes"),
-            "forecasts": forecast_data
+            "forecasts": forecast_data,
         }
     except Exception as e:
         import traceback
+
         std_logging.error(f"Error generating report: {e}\n{traceback.format_exc()}")
         return {"status": "error", "message": str(e)}
 
@@ -176,22 +198,22 @@ def serve_dashboard():
             --text-secondary: #64748b;
             --accent-primary: #00bcd4;
             --accent-secondary: #0097a7;
-            
+
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
             --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
             --shadow-glow: 0 10px 25px rgba(0, 188, 212, 0.08);
         }
-        
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
-            background-image: 
+            background-image:
                 radial-gradient(at 0% 0%, rgba(0, 188, 212, 0.04) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(0, 151, 167, 0.04) 0px, transparent 50%);
             color: var(--text-primary);
@@ -553,11 +575,11 @@ def serve_dashboard():
                         issues.push(`${formattedLabel}: ${met.reason}`);
                     }
                 });
-                
+
                 if (issues.length === 0) {
                     return `${partLabel} (${timeRange}): Green - Safe conditions`;
                 }
-                
+
                 return `${partLabel} (${timeRange}): ${partData.composite_color} - ${issues.join("; ")}`;
             };
 
@@ -606,13 +628,13 @@ def serve_dashboard():
                         let headerRow1 = `<th rowspan="3" style="vertical-align: middle; border-right: 2px solid var(--border-color); width: 140px; min-width: 140px;">Tiers</th>`;
                         let headerRow2 = ``;
                         let headerRow3 = ``;
-                        
+
                         datesList.forEach(dt => {
                             const parts = dt.split("-");
                             const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
                             const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
                             const dayOfMonth = parts[2];
-                            
+
                             headerRow1 += `<th colspan="3" style="text-align: center; border-right: 2px solid var(--border-color);">${dayOfWeek}</th>`;
                             headerRow2 += `<th colspan="3" style="text-align: center; border-bottom: 1px solid var(--border-color); border-right: 2px solid var(--border-color); font-size: 0.8rem; font-weight: 500;">${dayOfMonth}</th>`;
                             headerRow3 += `
@@ -700,7 +722,7 @@ def serve_dashboard():
                 errorMessage.textContent = msg;
                 errorMessage.style.display = "block";
             };
-            
+
             // Auto load on open
             loadReport();
         });

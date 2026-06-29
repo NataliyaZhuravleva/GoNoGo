@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+
 os.environ["INTEGRATION_TEST"] = "TRUE"
 
 from google.adk.agents.run_config import RunConfig, StreamingMode
