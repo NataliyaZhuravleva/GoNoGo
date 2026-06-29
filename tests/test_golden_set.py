@@ -238,8 +238,8 @@ def test_golden_scenario_rain_on_snow(mock_get, mock_load_regions):
     
     mock_resp = MagicMock()
     mock_resp.json.return_value = [
-        make_mock_hourly(5.0, 0.5, 10.0, 10.0, 15000.0, 100.0, start, end), # base (rain -> red)
-        make_mock_hourly(5.0, 0.5, 10.0, 10.0, 15000.0, 100.0, start, end), # mid (rain -> red)
+        make_mock_hourly(5.0, 2.0, 10.0, 10.0, 15000.0, 100.0, start, end), # base (rain -> red)
+        make_mock_hourly(5.0, 2.0, 10.0, 10.0, 15000.0, 100.0, start, end), # mid (rain -> red)
         make_mock_hourly(-5.0, 0.5, 10.0, 10.0, 15000.0, 100.0, start, end) # peak (snow at -5C/23F, 0.5 mm -> yellow)
     ]
     mock_get.return_value = mock_resp

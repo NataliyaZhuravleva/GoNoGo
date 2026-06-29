@@ -31,13 +31,13 @@ def evaluate_precipitation(precip_mm: float, temp_f: float) -> MetricVerdict:
     
     if is_rain:
         # Rain is highly discouraged in mountaineering (wet out, snow instability)
-        if precip_mm <= 0.2:
-            return {"color": "Yellow", "reason": f"Very light rain/drizzle ({precip_mm:.2f} mm/h)"}
+        if precip_mm <= 1.5:
+            return {"color": "Yellow", "reason": f"Light rain/drizzle ({precip_mm:.2f} mm/h)"}
         else:
-            return {"color": "Red", "reason": f"Rain ({precip_mm:.2f} mm/h) at temperatures above freezing"}
+            return {"color": "Red", "reason": f"Moderate/heavy rain ({precip_mm:.2f} mm/h)"}
     else:
         # Snow conditions
-        if precip_mm <= 1.0:
+        if precip_mm <= 2.5:
             return {"color": "Yellow", "reason": f"Light snow ({precip_mm:.2f} mm/h)"}
         else:
             return {"color": "Red", "reason": f"Heavy snow ({precip_mm:.2f} mm/h), high accumulation risk"}
