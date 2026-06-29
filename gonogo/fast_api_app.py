@@ -684,9 +684,6 @@ def serve_dashboard():
                                     <div class="region-name">${reg.headline_peak_name}</div>
                                     <div class="region-meta">${reg.region_name}</div>
                                 </div>
-                                <div class="badge-rain">
-                                    🌧️ ${reg.past_48h_precip_mm.toFixed(1)} mm <span style="font-size: 0.75rem; font-weight: 300;">(past 48h)</span>
-                                </div>
                             </div>
                             <div class="region-note">
                                 ${note}
