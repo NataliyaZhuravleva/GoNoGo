@@ -7,14 +7,23 @@ custom_metrics:
       def evaluate(instance):
           import os
           import json
+          import traceback
           from google.genai import Client
           from dotenv import load_dotenv
           
+          debug_log = "/tmp/eval_debug.txt"
+          with open(debug_log, "a") as dbg:
+              dbg.write("--- evaluate() call ---\n")
+              dbg.write(f"Cwd: {os.getcwd()}\n")
+              
           try:
               # 1. Dynamically load the local .env file
               env_path = os.path.join(os.getcwd(), ".env")
               load_dotenv(dotenv_path=env_path)
               api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+              
+              with open(debug_log, "a") as dbg:
+                  dbg.write(f"Loaded api_key: {api_key[:10] if api_key else None}...\n")
               
               if not api_key:
                   return {"score": 1, "explanation": "No GOOGLE_API_KEY found in .env"}
@@ -53,8 +62,15 @@ custom_metrics:
                   config={"response_mime_type": "application/json"}
               )
               data = json.loads(res.text)
-              return {"score": int(data.get("score", 3)), "explanation": data.get("explanation", "")}
+              result = {"score": int(data.get("score", 3)), "explanation": data.get("explanation", "")}
+              
+              with open(debug_log, "a") as dbg:
+                  dbg.write(f"Success: {result}\n")
+              return result
           except Exception as e:
+              err_str = traceback.format_exc()
+              with open(debug_log, "a") as dbg:
+                  dbg.write(f"Error: {err_str}\n")
               return {"score": 1, "explanation": f"Local evaluation failed: {e}"}
   - name: agent_turn_count
     custom_function: |

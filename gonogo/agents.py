@@ -69,7 +69,7 @@ class AdvisorAgentFactory:
             raise FileNotFoundError(f"Skill directory not found at {skills_dir}")
 
         skill_file = os.path.join(skills_dir, "SKILL.md")
-        with open(skill_file, "r", encoding="utf-8") as f:
+        with open(skill_file, encoding="utf-8") as f:
             skill_content = f.read()
 
         # Advisor instruction with dynamic state injection placeholder
