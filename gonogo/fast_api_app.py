@@ -229,43 +229,7 @@ def serve_dashboard():
             font-weight: 300;
         }
 
-        /* Controls */
-        .controls-card {
-            background: transparent;
-            border: none;
-            padding: 0;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: center;
-            box-shadow: none;
-        }
 
-        .btn-submit {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            border: none;
-            border-radius: 12px;
-            padding: 0.25rem 0.75rem;
-            color: white;
-            font-family: inherit;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 188, 212, 0.15);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 10px -3px rgba(0, 188, 212, 0.25);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
 
         /* Top Recommendation */
         .recommendation-card {
@@ -538,10 +502,7 @@ def serve_dashboard():
 
         <div class="message-box" id="error-message"></div>
 
-        <!-- Date Range Controls -->
-        <div class="controls-card">
-            <button class="btn-submit" id="btn-fetch">Refresh Conditions</button>
-        </div>
+
 
         <!-- Loading spinner -->
         <div class="loader-container" id="loader">
@@ -563,7 +524,6 @@ def serve_dashboard():
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const fetchBtn = document.getElementById("btn-fetch");
             const loader = document.getElementById("loader");
             const errorMessage = document.getElementById("error-message");
             const recCard = document.getElementById("recommendation-card");
@@ -740,8 +700,6 @@ def serve_dashboard():
                 errorMessage.textContent = msg;
                 errorMessage.style.display = "block";
             };
-
-            fetchBtn.addEventListener("click", loadReport);
             
             // Auto load on open
             loadReport();
