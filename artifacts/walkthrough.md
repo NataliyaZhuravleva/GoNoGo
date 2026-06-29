@@ -1,6 +1,6 @@
 # Walkthrough - GoNoGo Weekly Forecast (Phase 3.7 - Board Density & Timeframes)
 
-We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic wrapped tooltips, correct the trailhead freezing level safety logic, and remove the redundant refresh button:
+We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic wrapped tooltips, correct the trailhead freezing level safety logic, remove the redundant refresh button, and fix cross-environment compatibility issues:
 
 ## Changes Made
 
@@ -48,6 +48,10 @@ Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravle
   - **Precipitation**: Converted millimeters to **inches** (`in/h` or `inches`) (e.g., "Light snow (0.05 in/h)", "Past 48h Precip: 0.10 inches").
   - **Freezing Level & Winds**: Unified with existing **feet** (`ft`) and **miles per hour** (`mph`) representations.
 
+### 10. Cross-Environment Python Compatibility
+- Fixed a compatibility error where environments running Python < 3.12 (such as Python 3.11) threw `PydanticUserError` during test collection because `typing.TypedDict` was used as a field type inside a Pydantic model (`DayParts`). 
+- Changed `TypedDict` import in [rules.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/rules.py) to import from `typing_extensions`, resolving all compatibility issues.
+
 ---
 
 ## Verification Results
@@ -55,8 +59,8 @@ Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravle
 ### 1. Automated Tests
 All 22 unit and integration tests continue to pass cleanly:
 ```bash
-uv run pytest
-======================== 22 passed, 5 warnings in 35.41s ========================
+.venv/bin/pytest
+======================== 22 passed, 5 warnings in 3.64s ========================
 ```
 
 ### 2. Manual Verification
