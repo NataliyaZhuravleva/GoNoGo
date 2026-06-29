@@ -1,7 +1,7 @@
 # © 2026 Nataliya Zhuravleva. All rights reserved.
 import json
 import os
-from datetime import date
+from datetime import date, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -193,10 +193,12 @@ async def test_orchestrator_pipeline(mock_region_forecast):
         
         # Run orchestrator pipeline with a valid range
         events = []
+        tomorrow = (date.today() + timedelta(days=1)).isoformat()
+        day_after = (date.today() + timedelta(days=2)).isoformat()
         async for event in runner.run_async(
             user_id="user-1",
             session_id="sess-1",
-            new_message=types.Content(role="user", parts=[types.Part.from_text(text="2026-06-26 to 2026-06-27")])
+            new_message=types.Content(role="user", parts=[types.Part.from_text(text=f"{tomorrow} to {day_after}")])
         ):
             events.append(event)
 
