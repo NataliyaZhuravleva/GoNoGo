@@ -1,6 +1,6 @@
 # Walkthrough - GoNoGo Weekly Forecast (Phase 3.7 - Board Density & Timeframes)
 
-We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a bright cyan/teal palette, and match the user's specific timeframes:
+We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, and match the user's specific timeframes:
 
 ## Changes Made
 
@@ -25,8 +25,8 @@ We have successfully refined the mountaineering conditions board's layout and st
 - Removed the `Overall` rating column from both the table headers and rows, focusing the view entirely on the high-resolution, day-part specific cells.
 - Removed the "Past 48h Precip" badge info from all region cards to keep the header area clean and minimal.
 
-### 6. Bright Cyan / Teal Color Theme
-- Migrated all primary design color accents, title gradients, container backgrounds, button hover shadows, and loading indicators to a lighter, more vibrant and bright cyan/teal scheme (`#00b4d8` and `#0096c7`). This is highly readable, energetic, and clean.
+### 6. True Cyan / Turquoise Color Theme
+- Migrated all primary design color accents, title gradients, container backgrounds, button hover shadows, and loading indicators to a true, vibrant cyan/turquoise palette (`#00bcd4` and `#0097a7`). This removes the previous sky-blue tints and uses genuine cyan/aquamarine shades that remain highly readable and clean.
 
 ---
 
@@ -36,7 +36,7 @@ We have successfully refined the mountaineering conditions board's layout and st
 All 22 unit and integration tests continue to pass cleanly:
 ```bash
 uv run pytest
-======================== 22 passed, 5 warnings in 3.15s ========================
+======================== 22 passed, 5 warnings in 3.51s ========================
 ```
 
 ### 2. Manual Verification
