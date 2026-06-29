@@ -69,16 +69,16 @@ def test_evaluate_visibility():
     assert evaluate_visibility(500.0)["color"] == "Red"
 
 def test_evaluate_cloud_cover():
-    # Green threshold: < 30%
+    # Green threshold: < 50%
     assert evaluate_cloud_cover(0.0)["color"] == "Green"
-    assert evaluate_cloud_cover(29.9)["color"] == "Green"
+    assert evaluate_cloud_cover(49.9)["color"] == "Green"
     
-    # Yellow threshold: 30% <= cloud <= 80%
-    assert evaluate_cloud_cover(30.0)["color"] == "Yellow"
-    assert evaluate_cloud_cover(80.0)["color"] == "Yellow"
+    # Yellow threshold: 50% <= cloud <= 95%
+    assert evaluate_cloud_cover(50.0)["color"] == "Yellow"
+    assert evaluate_cloud_cover(95.0)["color"] == "Yellow"
     
-    # Red threshold: > 80%
-    assert evaluate_cloud_cover(80.1)["color"] == "Red"
+    # Red threshold: > 95%
+    assert evaluate_cloud_cover(95.1)["color"] == "Red"
     assert evaluate_cloud_cover(100.0)["color"] == "Red"
 
 def test_get_worst_color():

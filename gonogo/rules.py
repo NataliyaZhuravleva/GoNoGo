@@ -44,6 +44,12 @@ def evaluate_precipitation(precip_mm: float, temp_f: float) -> MetricVerdict:
 
 def evaluate_freezing_level(freezing_level_ft: float, tier_elevation_ft: float) -> MetricVerdict:
     """Evaluate freezing level relative to the tier elevation."""
+    # Trailheads/Base elevations (< 4000 ft) don't have alpine rockfall/crevasse melting hazards
+    if tier_elevation_ft <= 4000.0:
+        if freezing_level_ft > 12000.0:
+            return {"color": "Yellow", "reason": f"Warm valley temperatures (freezing level at {freezing_level_ft:.0f} ft)"}
+        return {"color": "Green", "reason": f"Safe base conditions (freezing level at {freezing_level_ft:.0f} ft)"}
+
     if freezing_level_ft <= tier_elevation_ft:
         return {"color": "Green", "reason": f"Freezing level ({freezing_level_ft:.0f} ft) is below tier ({tier_elevation_ft:.0f} ft)"}
     
@@ -66,9 +72,9 @@ def evaluate_visibility(visibility_meters: float) -> MetricVerdict:
 
 def evaluate_cloud_cover(cloud_cover_pct: float) -> MetricVerdict:
     """Evaluate cloud cover."""
-    if cloud_cover_pct < 30.0:
+    if cloud_cover_pct < 50.0:
         return {"color": "Green", "reason": f"Clear/mostly clear ({cloud_cover_pct:.0f}%)"}
-    elif cloud_cover_pct <= 80.0:
+    elif cloud_cover_pct <= 95.0:
         return {"color": "Yellow", "reason": f"Partly/mostly cloudy ({cloud_cover_pct:.0f}%)"}
     else:
         return {"color": "Red", "reason": f"Overcast/foggy ({cloud_cover_pct:.0f}%), whiteout risk"}

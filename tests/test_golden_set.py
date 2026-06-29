@@ -285,9 +285,9 @@ def test_golden_scenario_whiteout(mock_get, mock_load_regions):
     
     mock_resp = MagicMock()
     mock_resp.json.return_value = [
-        make_mock_hourly(5.0, 0.0, 10.0, 95.0, 1000.0, 100.0, start, end), # base (whiteout -> red)
-        make_mock_hourly(5.0, 0.0, 10.0, 95.0, 1000.0, 100.0, start, end), # mid (whiteout -> red)
-        make_mock_hourly(5.0, 0.0, 10.0, 95.0, 1000.0, 100.0, start, end)  # peak (whiteout -> red)
+        make_mock_hourly(5.0, 0.0, 10.0, 98.0, 1000.0, 100.0, start, end), # base (whiteout -> red)
+        make_mock_hourly(5.0, 0.0, 10.0, 98.0, 1000.0, 100.0, start, end), # mid (whiteout -> red)
+        make_mock_hourly(5.0, 0.0, 10.0, 98.0, 1000.0, 100.0, start, end)  # peak (whiteout -> red)
     ]
     mock_get.return_value = mock_resp
     
