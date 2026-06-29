@@ -1,12 +1,12 @@
 # Walkthrough - GoNoGo Weekly Forecast (Phase 3.7 - Board Density & Timeframes)
 
-We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic wrapped tooltips, and correct the trailhead freezing level safety logic:
+We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic wrapped tooltips, correct the trailhead freezing level safety logic, and remove the redundant refresh button:
 
 ## Changes Made
 
 ### 1. Compact Header and High-Density Cards
 - Drastically shrunken the main page header text size (`h1` size reduced to `1.75rem`), body padding, and card spacing, allowing the user to immediately see the actual content board without scrolling.
-- Replaced the large Refresh button with a very small, clean button component (`height: 28px`, `font-size: 0.75rem`) placed right below the header.
+- Completely removed the "Refresh Conditions" button and its container card, saving valuable vertical spacing above the recommendation card.
 
 ### 2. Weekday & Day-of-Month Headers
 - Redesigned the table headers. The dates are now displayed as a two-row header:
@@ -56,7 +56,7 @@ Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravle
 All 22 unit and integration tests continue to pass cleanly:
 ```bash
 uv run pytest
-======================== 22 passed, 5 warnings in 25.02s ========================
+======================== 22 passed, 5 warnings in 35.41s ========================
 ```
 
 ### 2. Manual Verification
