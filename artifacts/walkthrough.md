@@ -1,6 +1,6 @@
 # Walkthrough - GoNoGo Weekly Forecast (Phase 3.7 - Board Density & Timeframes)
 
-We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, and implement dynamic helper tooltips:
+We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic tooltips, and correct the trailhead freezing level safety logic:
 
 ## Changes Made
 
@@ -32,7 +32,7 @@ We have successfully refined the mountaineering conditions board's layout and st
 Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/rules.py) to represent realistic alpine hazard triggers:
 - **Rain (Above Freezing)**: Red threshold set to `> 1.5 mm/h` (moderate/heavy rain wetting out gear/destabilizing snowpack), while `≤ 1.5 mm/h` is Yellow (manageable light rain).
 - **Snow (Below Freezing)**: Red threshold set to `> 2.5 mm/h` liquid equivalent (~2.5 cm/h snow accumulation, triggering high avalanche and navigation hazard), while `≤ 2.5 mm/h` is Yellow (light snow).
-- **Freezing Level**: Trailhead/Base tiers (`≤ 4000 ft` elevation) do not have alpine crevasse/rockfall hazards. We now skip freezing level melting warnings for these tiers (capping them at Green, or Yellow if extremely hot at `> 12000 ft`), preventing warm valley trailheads from turning the entire region Red.
+- **Freezing Level (Trailhead Exemption)**: Trailheads and approach routes (represented by the `base` tier) do not carry alpine melting hazards (no active crevasse bridges or steep volcanic rockfall zones exist at forest/dirt trailheads). We now pass the `tier_key` into the rules engine and **completely bypass freezing level hazard evaluations for the base tier**, returning Green ("Safe base conditions").
 - **Cloud Cover**: Shunted the Red whiteout hazard threshold to `> 95.0%` (fully overcast fog/deck), while broken/cloudy skies (`50%` to `95%`) are classed as Yellow.
 - **Wind**: Maintained Red at `> 30 mph` (ridge walking hazards) and Yellow at `15 - 30 mph`.
 - **Visibility**: Maintained Red at `< 3 km` (navigation/whiteout hazard) and Yellow at `3 - 10 km`.
@@ -55,7 +55,7 @@ Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravle
 All 22 unit and integration tests continue to pass cleanly:
 ```bash
 uv run pytest
-======================== 22 passed, 5 warnings in 3.09s ========================
+======================== 22 passed, 5 warnings in 50.72s ========================
 ```
 
 ### 2. Manual Verification
