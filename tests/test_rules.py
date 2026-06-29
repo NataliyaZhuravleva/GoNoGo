@@ -54,6 +54,9 @@ def test_evaluate_freezing_level():
     # Red threshold: > 3,000 ft above
     assert evaluate_freezing_level(8001.0, 5000.0)["color"] == "Red"
     assert evaluate_freezing_level(10000.0, 5000.0)["color"] == "Red"
+    
+    # Base tier: always Green
+    assert evaluate_freezing_level(10000.0, 3000.0, tier_key="base")["color"] == "Green"
 
 def test_evaluate_visibility():
     # Green threshold: >= 10,000m

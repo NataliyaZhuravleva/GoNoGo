@@ -281,7 +281,8 @@ def fetch_conditions(
                         cloud_cover_pct=cloud_pct,
                         visibility_m=vis_m,
                         freezing_level_ft=freezing_ft,
-                        tier_elevation_ft=elev_ft
+                        tier_elevation_ft=elev_ft,
+                        tier_key=tier_key
                     )
                 except (ValueError, KeyError, IndexError):
                     # Fallback default if data missing

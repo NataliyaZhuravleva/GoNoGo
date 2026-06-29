@@ -43,12 +43,10 @@ def evaluate_precipitation(precip_mm: float, temp_f: float) -> MetricVerdict:
         else:
             return {"color": "Red", "reason": f"Heavy snow ({precip_in:.2f} in/h), high accumulation risk"}
 
-def evaluate_freezing_level(freezing_level_ft: float, tier_elevation_ft: float) -> MetricVerdict:
+def evaluate_freezing_level(freezing_level_ft: float, tier_elevation_ft: float, tier_key: str = "peak") -> MetricVerdict:
     """Evaluate freezing level relative to the tier elevation."""
-    # Trailheads/Base elevations (< 4000 ft) don't have alpine rockfall/crevasse melting hazards
-    if tier_elevation_ft <= 4000.0:
-        if freezing_level_ft > 12000.0:
-            return {"color": "Yellow", "reason": f"Warm valley temperatures (freezing level at {freezing_level_ft:.0f} ft)"}
+    # Trailheads/Base elevations don't have alpine rockfall/crevasse melting hazards
+    if tier_key == "base":
         return {"color": "Green", "reason": f"Safe base conditions (freezing level at {freezing_level_ft:.0f} ft)"}
 
     if freezing_level_ft <= tier_elevation_ft:
@@ -96,12 +94,13 @@ def evaluate_cell(
     cloud_cover_pct: float,
     visibility_m: float,
     freezing_level_ft: float,
-    tier_elevation_ft: float
+    tier_elevation_ft: float,
+    tier_key: str = "peak"
 ) -> CellVerdict:
     """Evaluate all conditions for a single cell (day-part at a specific tier)."""
     wind_verdict = evaluate_wind(wind_speed_mph)
     precip_verdict = evaluate_precipitation(precip_mm, temp_f)
-    freezing_verdict = evaluate_freezing_level(freezing_level_ft, tier_elevation_ft)
+    freezing_verdict = evaluate_freezing_level(freezing_level_ft, tier_elevation_ft, tier_key)
     visibility_verdict = evaluate_visibility(visibility_m)
     cloud_verdict = evaluate_cloud_cover(cloud_cover_pct)
     
