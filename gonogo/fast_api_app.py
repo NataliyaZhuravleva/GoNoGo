@@ -170,16 +170,16 @@ def serve_dashboard():
         :root {
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --card-hover-border: rgba(8, 145, 178, 0.4);
+            --card-hover-border: rgba(0, 180, 216, 0.4);
             --border-color: #e2e8f0;
             --text-primary: #0f172a;
             --text-secondary: #64748b;
-            --accent-primary: #0891b2;
-            --accent-secondary: #0f766e;
+            --accent-primary: #00b4d8;
+            --accent-secondary: #0096c7;
             
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
             --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
-            --shadow-glow: 0 10px 25px rgba(8, 145, 178, 0.08);
+            --shadow-glow: 0 10px 25px rgba(0, 180, 216, 0.08);
         }
         
         * {
@@ -192,8 +192,8 @@ def serve_dashboard():
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(8, 145, 178, 0.04) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(15, 118, 110, 0.04) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(0, 180, 216, 0.04) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 150, 199, 0.04) 0px, transparent 50%);
             color: var(--text-primary);
             min-height: 100vh;
             padding: 1.5rem;
@@ -216,7 +216,7 @@ def serve_dashboard():
         h1 {
             font-size: 1.75rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), #0d9488);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), #22d3ee);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.25rem;
@@ -255,12 +255,12 @@ def serve_dashboard():
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(8, 145, 178, 0.15);
+            box-shadow: 0 4px 6px -1px rgba(0, 180, 216, 0.15);
         }
 
         .btn-submit:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 10px -3px rgba(8, 145, 178, 0.25);
+            box-shadow: 0 6px 10px -3px rgba(0, 180, 216, 0.25);
         }
 
         .btn-submit:active {
@@ -269,10 +269,10 @@ def serve_dashboard():
 
         /* Top Recommendation */
         .recommendation-card {
-            background: linear-gradient(135deg, rgba(8, 145, 178, 0.04), rgba(15, 118, 110, 0.04));
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.04), rgba(0, 150, 199, 0.04));
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(15, 118, 110, 0.15);
+            border: 1px solid rgba(0, 150, 199, 0.15);
             border-radius: 12px;
             padding: 1.25rem;
             margin-bottom: 1.5rem;
@@ -352,8 +352,8 @@ def serve_dashboard():
         }
 
         .badge-rain {
-            background: rgba(8, 145, 178, 0.08);
-            border: 1px solid rgba(8, 145, 178, 0.15);
+            background: rgba(0, 180, 216, 0.08);
+            border: 1px solid rgba(0, 180, 216, 0.15);
             color: var(--accent-primary);
             border-radius: 99px;
             padding: 0.25rem 0.75rem;
@@ -466,7 +466,7 @@ def serve_dashboard():
         .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(8, 145, 178, 0.1);
+            border: 3px solid rgba(0, 180, 216, 0.1);
             border-top-color: var(--accent-primary);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
