@@ -21,8 +21,9 @@ We have successfully refined the mountaineering conditions board's layout and st
 ### 4. Visual Separation by Day
 - Added crisp vertical separators (`border-right: 2px solid var(--border-color)`) between the 3-column day segments in both the headers and body cells, making it easy to scan day-by-day.
 
-### 5. Removal of Overall Column
+### 5. Removal of Overall Column & Past 48h Info
 - Removed the `Overall` rating column from both the table headers and rows, focusing the view entirely on the high-resolution, day-part specific cells.
+- Removed the "Past 48h Precip" badge info from all region cards to keep the header area clean and minimal.
 
 ---
 
