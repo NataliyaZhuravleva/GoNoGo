@@ -387,7 +387,8 @@ def serve_dashboard():
             border-collapse: collapse;
             text-align: left;
             font-size: 0.85rem;
-            min-width: 800px;
+            min-width: 880px;
+            table-layout: fixed;
         }
 
         th, td {
@@ -410,6 +411,11 @@ def serve_dashboard():
             background: #f8fafc;
             border-right: 2px solid var(--border-color);
             font-size: 0.8rem;
+            width: 140px;
+            min-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* Day part rendering */
@@ -614,7 +620,7 @@ def serve_dashboard():
                         const datesList = peakTier ? peakTier.forecast_days.map(d => d.date) : [];
 
                         // Build Table Header
-                        let headerRow1 = `<th rowspan="3" style="vertical-align: middle; border-right: 2px solid var(--border-color);">Tiers</th>`;
+                        let headerRow1 = `<th rowspan="3" style="vertical-align: middle; border-right: 2px solid var(--border-color); width: 140px; min-width: 140px;">Tiers</th>`;
                         let headerRow2 = ``;
                         let headerRow3 = ``;
                         
@@ -627,9 +633,9 @@ def serve_dashboard():
                             headerRow1 += `<th colspan="3" style="text-align: center; border-right: 2px solid var(--border-color);">${dayOfWeek}</th>`;
                             headerRow2 += `<th colspan="3" style="text-align: center; border-bottom: 1px solid var(--border-color); border-right: 2px solid var(--border-color); font-size: 0.8rem; font-weight: 500;">${dayOfMonth}</th>`;
                             headerRow3 += `
-                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">AM</th>
-                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">PM</th>
-                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem; border-right: 2px solid var(--border-color);">Night</th>
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem; width: 35px; min-width: 35px; max-width: 35px;">AM</th>
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem; width: 35px; min-width: 35px; max-width: 35px;">PM</th>
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem; width: 35px; min-width: 35px; max-width: 35px; border-right: 2px solid var(--border-color);">Night</th>
                             `;
                         });
 
@@ -652,13 +658,13 @@ def serve_dashboard():
                                 const e = day.parts.evening;
 
                                 cells += `
-                                    <td style="text-align: center; padding: 0.4rem 0.25rem;">
+                                    <td style="text-align: center; padding: 0.4rem 0.25rem; width: 35px; min-width: 35px; max-width: 35px;">
                                         <span class="dot-cell ${colorClassMap[m.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="AM (4am-12pm): ${m.composite_color} - ${m.wind.reason}"></span>
                                     </td>
-                                    <td style="text-align: center; padding: 0.4rem 0.25rem;">
+                                    <td style="text-align: center; padding: 0.4rem 0.25rem; width: 35px; min-width: 35px; max-width: 35px;">
                                         <span class="dot-cell ${colorClassMap[d.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="PM (12pm-8pm): ${d.composite_color} - ${d.precipitation.reason}"></span>
                                     </td>
-                                    <td style="text-align: center; padding: 0.4rem 0.25rem; border-right: 2px solid var(--border-color);">
+                                    <td style="text-align: center; padding: 0.4rem 0.25rem; width: 35px; min-width: 35px; max-width: 35px; border-right: 2px solid var(--border-color);">
                                         <span class="dot-cell ${colorClassMap[e.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Night (8pm-4am): ${e.composite_color} - ${e.visibility.reason}"></span>
                                     </td>
                                 `;
