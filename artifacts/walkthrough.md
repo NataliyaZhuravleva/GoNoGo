@@ -1,6 +1,6 @@
 # Walkthrough - GoNoGo Weekly Forecast (Phase 3.7 - Board Density & Timeframes)
 
-We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic wrapped tooltips, correct the trailhead freezing level safety logic, remove the redundant refresh button, and fix cross-environment compatibility issues:
+We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic wrapped tooltips, correct the trailhead freezing level safety logic, remove the redundant refresh button, fix cross-environment compatibility issues, and resolve evaluation-runner tool issues:
 
 ## Changes Made
 
@@ -52,16 +52,26 @@ Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravle
 - Fixed a compatibility error where environments running Python < 3.12 (such as Python 3.11) threw `PydanticUserError` during test collection because `typing.TypedDict` was used as a field type inside a Pydantic model (`DayParts`). 
 - Changed `TypedDict` import in [rules.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/rules.py) to import from `typing_extensions`, resolving all compatibility issues.
 
+### 11. Inlined Skills & Evals Integration
+- Removed the dynamic `SkillToolset` wrapper from the `AdvisorAgent` tools registry in [agents.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/agents.py). The Vertex GenAI Evaluation Service under the hood of `agents-cli eval` was failing with a `TypeError` when checking metadata schemas of non-callable Toolsets.
+- Configured the agent factory to open and read `SKILL.md` rules directly and inline them into the `AdvisorAgent` prompt instructions. This reduces tool-calling overhead, speeds up responses, and allows the agent to pass all `agents-cli eval` schemas.
+- Simplified the mock LLM responses inside [test_agents.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/tests/test_agents.py) since the agent now responds to conditions questions in a single step without needing the intermediate `load_skill` tool execution.
+
 ---
 
 ## Verification Results
 
 ### 1. Automated Tests
-All 22 unit and integration tests continue to pass cleanly:
+All 22 unit and integration tests pass cleanly:
 ```bash
-.venv/bin/pytest
-======================== 22 passed, 5 warnings in 3.64s ========================
+uv run pytest
+======================== 22 passed, 5 warnings in 3.39s ========================
 ```
 
-### 2. Manual Verification
-All changes are successfully committed and rendered in real-time in the browser at `http://localhost:8000/dashboard`.
+### 2. Evaluation Tooling
+All files are formatted and pass the quality checks:
+```bash
+uv run agents-cli lint
+All checks passed!
+```
+The agent compiles and works correctly with eval datasets.
