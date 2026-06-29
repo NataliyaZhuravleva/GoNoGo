@@ -1,6 +1,6 @@
 # Walkthrough - GoNoGo Weekly Forecast (Phase 3.7 - Board Density & Timeframes)
 
-We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, and match the user's specific timeframes:
+We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update precipitation thresholds, and match the user's specific timeframes:
 
 ## Changes Made
 
@@ -28,6 +28,16 @@ We have successfully refined the mountaineering conditions board's layout and st
 ### 6. True Cyan / Turquoise Color Theme
 - Migrated all primary design color accents, title gradients, container backgrounds, button hover shadows, and loading indicators to a true, vibrant cyan/turquoise palette (`#00bcd4` and `#0097a7`). This removes the previous sky-blue tints and uses genuine cyan/aquamarine shades that remain highly readable and clean.
 
+### 7. Realistic Precipitation Thresholds
+- Refined the weather classification thresholds inside [rules.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/rules.py) to map to realistic meteorological classifications:
+  - **Rain (Above Freezing)**:
+    - **Yellow (Light Drizzle/Rain)**: Up to `1.5 mm/h` (manageable with proper shell gear).
+    - **Red (Moderate/Heavy)**: `> 1.5 mm/h` (high wet-out and rapid snowpack degradation risk).
+  - **Snow (At/Below Freezing)**:
+    - **Yellow (Light Snow)**: Up to `2.5 mm/h` (flurries).
+    - **Red (Heavy Snow)**: `> 2.5 mm/h` (risk of rapid snow accumulation and avalanches).
+- Updated the assertions and mocked metrics inside the test suite (`tests/test_rules.py` and `tests/test_golden_set.py`) to align with these parameters.
+
 ---
 
 ## Verification Results
@@ -36,7 +46,7 @@ We have successfully refined the mountaineering conditions board's layout and st
 All 22 unit and integration tests continue to pass cleanly:
 ```bash
 uv run pytest
-======================== 22 passed, 5 warnings in 3.51s ========================
+======================== 22 passed, 5 warnings in 27.80s ========================
 ```
 
 ### 2. Manual Verification
