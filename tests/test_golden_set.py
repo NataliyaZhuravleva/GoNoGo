@@ -46,6 +46,7 @@ def make_mock_hourly(
             "time": times,
             "temperature_2m": [temp_c] * num_hours,
             "precipitation": precip_series,
+            "wind_speed_10m": [wind_kmh] * num_hours,
             "wind_gusts_10m": [wind_kmh] * num_hours,
             "cloud_cover": [cloud_pct] * num_hours,
             "visibility": [vis_m] * num_hours,

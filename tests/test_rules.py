@@ -23,6 +23,10 @@ def test_evaluate_wind():
     assert evaluate_wind(30.1)["color"] == "Red"
     assert evaluate_wind(50.0)["color"] == "Red"
 
+    # Gust label appears in reason when is_gust=True
+    assert "gusts" in evaluate_wind(20.0, is_gust=True)["reason"]
+    assert "winds" in evaluate_wind(20.0, is_gust=False)["reason"]
+
 
 def test_evaluate_precipitation():
     # Green threshold: <= 0.01 mm/h

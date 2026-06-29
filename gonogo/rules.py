@@ -16,22 +16,23 @@ class CellVerdict(TypedDict):
     cloud_cover: MetricVerdict
 
 
-def evaluate_wind(wind_speed_mph: float) -> MetricVerdict:
+def evaluate_wind(wind_speed_mph: float, is_gust: bool = False) -> MetricVerdict:
     """Evaluate wind speed on exposed terrain."""
+    label = "gusts" if is_gust else "winds"
     if wind_speed_mph < 15.0:
         return {
             "color": "Green",
-            "reason": f"Calm/light winds ({wind_speed_mph:.1f} mph)",
+            "reason": f"Calm/light {label} ({wind_speed_mph:.1f} mph)",
         }
     elif wind_speed_mph <= 30.0:
         return {
             "color": "Yellow",
-            "reason": f"Moderate winds ({wind_speed_mph:.1f} mph), watch exposure",
+            "reason": f"Moderate {label} ({wind_speed_mph:.1f} mph), watch exposure",
         }
     else:
         return {
             "color": "Red",
-            "reason": f"High winds ({wind_speed_mph:.1f} mph), dangerous on ridges",
+            "reason": f"High {label} ({wind_speed_mph:.1f} mph), dangerous on ridges",
         }
 
 
@@ -155,9 +156,10 @@ def evaluate_cell(
     freezing_level_ft: float,
     tier_elevation_ft: float,
     tier_key: str = "peak",
+    wind_is_gust: bool = False,
 ) -> CellVerdict:
     """Evaluate all conditions for a single cell (day-part at a specific tier)."""
-    wind_verdict = evaluate_wind(wind_speed_mph)
+    wind_verdict = evaluate_wind(wind_speed_mph, is_gust=wind_is_gust)
     precip_verdict = evaluate_precipitation(precip_mm, temp_f)
     freezing_verdict = evaluate_freezing_level(
         freezing_level_ft, tier_elevation_ft, tier_key

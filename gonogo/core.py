@@ -212,7 +212,7 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
         "latitude": ",".join(str(lat) for lat in lats),
         "longitude": ",".join(str(lon) for lon in lons),
         "elevation": ",".join(str(round(e)) for e in elevs_m),
-        "hourly": "temperature_2m,precipitation,wind_gusts_10m,cloud_cover,visibility,freezing_level_height",
+        "hourly": "temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m,cloud_cover,visibility,freezing_level_height",
         "timezone": "America/Los_Angeles",
         "past_days": 2,
     }
@@ -261,7 +261,8 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
         times = hourly["time"]
         temps_c = hourly["temperature_2m"]
         precips = hourly["precipitation"]
-        winds_kmh = hourly["wind_gusts_10m"]
+        winds_kmh = hourly["wind_speed_10m"]
+        gusts_kmh = hourly.get("wind_gusts_10m")
         clouds = hourly["cloud_cover"]
         visibilities = hourly["visibility"]
         freezing_m = hourly["freezing_level_height"]
@@ -288,7 +289,14 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
 
                     t_f = celsius_to_fahrenheit(temps_c[t_idx])
                     p_mm = precips[t_idx]
-                    w_mph = kmh_to_mph(winds_kmh[t_idx])
+                    sustained_mph = kmh_to_mph(winds_kmh[t_idx])
+                    gust_mph = (
+                        kmh_to_mph(gusts_kmh[t_idx])
+                        if gusts_kmh is not None and gusts_kmh[t_idx] is not None
+                        else None
+                    )
+                    w_mph = max(sustained_mph, gust_mph) if gust_mph is not None else sustained_mph
+                    is_gust = gust_mph is not None and gust_mph > sustained_mph
                     cloud_pct = clouds[t_idx]
                     vis_m = visibilities[t_idx]
                     freezing_ft = meters_to_feet(freezing_m[t_idx])
@@ -297,6 +305,7 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
                         temp_f=t_f,
                         precip_mm=p_mm,
                         wind_speed_mph=w_mph,
+                        wind_is_gust=is_gust,
                         cloud_cover_pct=cloud_pct,
                         visibility_m=vis_m,
                         freezing_level_ft=freezing_ft,
