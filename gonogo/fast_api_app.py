@@ -168,20 +168,18 @@ def serve_dashboard():
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #080c14;
-            --card-bg: rgba(17, 24, 39, 0.7);
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
             --card-hover-border: rgba(59, 130, 246, 0.4);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-primary: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --accent-primary: #3b82f6;
-            --accent-secondary: #8b5cf6;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent-primary: #2563eb;
+            --accent-secondary: #4f46e5;
             
-            --color-green: #10b981;
-            --color-yellow: #f59e0b;
-            --color-red: #ef4444;
-            
-            --shadow-glow: 0 0 25px rgba(59, 130, 246, 0.15);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+            --shadow-glow: 0 10px 25px rgba(37, 99, 235, 0.08);
         }
         
         * {
@@ -194,8 +192,8 @@ def serve_dashboard():
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.04) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.04) 0px, transparent 50%);
             color: var(--text-primary);
             min-height: 100vh;
             padding: 3rem 1.5rem;
@@ -212,17 +210,17 @@ def serve_dashboard():
         /* Header */
         header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 2.75rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), #d946ef);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.04em;
         }
 
         header p {
@@ -231,75 +229,38 @@ def serve_dashboard():
             font-weight: 300;
         }
 
-        /* Controls / Form */
+        /* Controls */
         .controls-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 2.5rem;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin-bottom: 2rem;
             display: flex;
-            gap: 1.5rem;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .input-group label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .input-group input {
-            background: rgba(31, 41, 55, 0.5);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+            justify-content: center;
+            box-shadow: none;
         }
 
         .btn-submit {
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
             border: none;
-            border-radius: 8px;
-            padding: 0.75rem 2rem;
+            border-radius: 16px;
+            padding: 0.35rem 1.25rem;
             color: white;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            height: 48px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 12px -3px rgba(37, 99, 235, 0.3);
         }
 
         .btn-submit:active {
@@ -308,10 +269,10 @@ def serve_dashboard():
 
         /* Top Recommendation */
         .recommendation-card {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(79, 70, 229, 0.04));
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            border: 1px solid rgba(79, 70, 229, 0.15);
             border-radius: 16px;
             padding: 2rem;
             margin-bottom: 3rem;
@@ -325,13 +286,13 @@ def serve_dashboard():
             align-items: center;
             gap: 0.75rem;
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             margin-bottom: 0.75rem;
-            color: #60a5fa;
+            color: var(--accent-primary);
         }
 
         .rec-text {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             line-height: 1.6;
             color: var(--text-primary);
             font-weight: 400;
@@ -346,13 +307,11 @@ def serve_dashboard():
 
         .region-card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 2rem;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s, border-color 0.3s;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             animation: fadeIn 0.5s ease-out;
             display: flex;
             flex-direction: column;
@@ -361,7 +320,8 @@ def serve_dashboard():
 
         .region-card:hover {
             border-color: var(--card-hover-border);
-            transform: translateY(-4px);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
         }
 
         .region-header {
@@ -370,7 +330,7 @@ def serve_dashboard():
             align-items: flex-start;
             flex-wrap: wrap;
             gap: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 1rem;
         }
 
@@ -381,20 +341,20 @@ def serve_dashboard():
         }
 
         .region-name {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.6rem;
+            font-weight: 700;
             color: var(--text-primary);
         }
 
         .region-meta {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
         }
 
         .badge-rain {
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            color: #60a5fa;
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.15);
+            color: var(--accent-primary);
             border-radius: 99px;
             padding: 0.35rem 0.85rem;
             font-size: 0.85rem;
@@ -405,20 +365,21 @@ def serve_dashboard():
         }
 
         .region-note {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(0, 0, 0, 0.015);
             border-left: 4px solid var(--accent-primary);
             padding: 1rem 1.25rem;
             border-radius: 4px;
             font-size: 1rem;
             line-height: 1.5;
-            color: #d1d5db;
+            color: #334155;
         }
 
         /* 3-Tier Tables */
         .table-container {
             overflow-x: auto;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
         }
 
         table {
@@ -426,18 +387,18 @@ def serve_dashboard():
             border-collapse: collapse;
             text-align: left;
             font-size: 0.9rem;
-            min-width: 600px;
+            min-width: 800px;
         }
 
         th, td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 0.5rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            background: rgba(31, 41, 55, 0.4);
+            background: #f8fafc;
             color: var(--text-secondary);
-            font-weight: 500;
+            font-weight: 600;
             text-transform: uppercase;
             font-size: 0.75rem;
             letter-spacing: 0.05em;
@@ -446,6 +407,8 @@ def serve_dashboard():
         td.tier-label {
             font-weight: 600;
             color: var(--text-primary);
+            background: #f8fafc;
+            border-right: 1px solid var(--border-color);
         }
 
         /* Day part rendering */
@@ -453,19 +416,13 @@ def serve_dashboard():
             text-align: center;
         }
 
-        .day-parts-dots {
-            display: inline-flex;
-            gap: 0.5rem;
-            justify-content: center;
-            align-items: center;
-        }
-
         .dot-cell {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             display: inline-block;
             position: relative;
+            vertical-align: middle;
         }
 
         /* Overall Badge */
@@ -477,13 +434,17 @@ def serve_dashboard():
             height: 24px;
             border-radius: 6px;
             font-weight: 700;
-            color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            font-size: 0.8rem;
+            vertical-align: middle;
         }
 
-        .bg-green { background-color: var(--color-green); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-        .bg-yellow { background-color: var(--color-yellow); box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
-        .bg-red { background-color: var(--color-red); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+        .bg-green { background-color: #d1fae5; border: 1.5px solid #10b981; }
+        .bg-yellow { background-color: #fef3c7; border: 1.5px solid #f59e0b; }
+        .bg-red { background-color: #fee2e2; border: 1.5px solid #ef4444; }
+
+        .overall-badge.bg-green { color: #065f46; }
+        .overall-badge.bg-yellow { color: #78350f; }
+        .overall-badge.bg-red { color: #991b1b; }
 
         /* Loader & Messages */
         .loader-container {
@@ -496,21 +457,21 @@ def serve_dashboard():
         }
 
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(37, 99, 235, 0.1);
             border-top-color: var(--accent-primary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         .message-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #f87171;
-            padding: 1.5rem;
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #b91c1c;
+            padding: 1.25rem;
             border-radius: 12px;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             display: none;
             line-height: 1.5;
             animation: fadeIn 0.3s ease-out;
@@ -526,7 +487,7 @@ def serve_dashboard():
             to { opacity: 1; }
         }
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -537,16 +498,18 @@ def serve_dashboard():
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%) translateY(-6px);
-            background: rgba(0,0,0,0.85);
+            background: #1e293b;
             color: #fff;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            padding: 0.35rem 0.6rem;
+            border-radius: 6px;
             font-size: 0.7rem;
+            font-weight: 400;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.15s;
             z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .dot-cell:hover::after {
@@ -564,7 +527,7 @@ def serve_dashboard():
         <div class="message-box" id="error-message"></div>
 
         <!-- Date Range Controls -->
-        <div class="controls-card" style="justify-content: center; align-items: center;">
+        <div class="controls-card">
             <button class="btn-submit" id="btn-fetch">Refresh Conditions</button>
         </div>
 
@@ -650,14 +613,21 @@ def serve_dashboard():
                         const datesList = peakTier ? peakTier.forecast_days.map(d => d.date) : [];
 
                         // Build Table Header
-                        let tableHeaders = `<th>Tiers</th>`;
+                        let headerRow1 = `<th rowspan="2" style="vertical-align: middle;">Tiers</th>`;
+                        let headerRow2 = ``;
+                        
                         datesList.forEach(dt => {
                             // format date to MM/DD
                             const parts = dt.split("-");
                             const formattedDate = `${parts[1]}/${parts[2]}`;
-                            tableHeaders += `<th style="text-align: center;">${formattedDate}</th>`;
+                            headerRow1 += `<th colspan="3" style="text-align: center; border-bottom: 1px solid var(--border-color);">${formattedDate}</th>`;
+                            headerRow2 += `
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">M</th>
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">D</th>
+                                <th style="text-align: center; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.15rem;">E</th>
+                            `;
                         });
-                        tableHeaders += `<th style="text-align: center;">Overall</th>`;
+                        headerRow1 += `<th rowspan="2" style="text-align: center; vertical-align: middle; border-left: 1px solid var(--border-color);">Overall</th>`;
 
                         // Build Table Rows (Peak, Mid, Base)
                         let tableRows = "";
@@ -678,12 +648,14 @@ def serve_dashboard():
                                 const e = day.parts.evening;
 
                                 cells += `
-                                    <td class="day-column-cell">
-                                        <div class="day-parts-dots">
-                                            <span class="dot-cell ${colorClassMap[m.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Morning: ${m.composite_color} - ${m.wind.reason}"></span>
-                                            <span class="dot-cell ${colorClassMap[d.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Midday: ${d.composite_color} - ${d.precipitation.reason}"></span>
-                                            <span class="dot-cell ${colorClassMap[e.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Evening: ${e.composite_color} - ${e.visibility.reason}"></span>
-                                        </div>
+                                    <td style="text-align: center; padding: 0.5rem 0.25rem;">
+                                        <span class="dot-cell ${colorClassMap[m.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Morning: ${m.composite_color} - ${m.wind.reason}"></span>
+                                    </td>
+                                    <td style="text-align: center; padding: 0.5rem 0.25rem;">
+                                        <span class="dot-cell ${colorClassMap[d.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Midday: ${d.composite_color} - ${d.precipitation.reason}"></span>
+                                    </td>
+                                    <td style="text-align: center; padding: 0.5rem 0.25rem;">
+                                        <span class="dot-cell ${colorClassMap[e.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Evening: ${e.composite_color} - ${e.visibility.reason}"></span>
                                     </td>
                                 `;
                             });
@@ -696,7 +668,7 @@ def serve_dashboard():
                                 <tr>
                                     <td class="tier-label">${tierObj.label}</td>
                                     ${cells}
-                                    <td style="text-align: center;">
+                                    <td style="text-align: center; border-left: 1px solid var(--border-color);">
                                         <span class="overall-badge ${overallClass}">${overallText}</span>
                                     </td>
                                 </tr>
@@ -706,8 +678,8 @@ def serve_dashboard():
                         card.innerHTML = `
                             <div class="region-header">
                                 <div class="region-title-area">
-                                    <div class="region-name">${reg.region_name}</div>
-                                    <div class="region-meta">Headline Peak: ${reg.headline_peak_name}</div>
+                                    <div class="region-name">${reg.headline_peak_name}</div>
+                                    <div class="region-meta">${reg.region_name}</div>
                                 </div>
                                 <div class="badge-rain">
                                     🌧️ ${reg.past_48h_precip_mm.toFixed(1)} mm <span style="font-size: 0.75rem; font-weight: 300;">(past 48h)</span>
@@ -719,7 +691,8 @@ def serve_dashboard():
                             <div class="table-container">
                                 <table>
                                     <thead>
-                                        <tr>${tableHeaders}</tr>
+                                        <tr>${headerRow1}</tr>
+                                        <tr>${headerRow2}</tr>
                                     </thead>
                                     <tbody>
                                         ${tableRows}
