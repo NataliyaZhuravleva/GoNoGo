@@ -1,6 +1,6 @@
 # Walkthrough - GoNoGo Weekly Forecast (Phase 3.7 - Board Density & Timeframes)
 
-We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update precipitation thresholds, and match the user's specific timeframes:
+We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, and match the user's specific timeframes:
 
 ## Changes Made
 
@@ -28,15 +28,14 @@ We have successfully refined the mountaineering conditions board's layout and st
 ### 6. True Cyan / Turquoise Color Theme
 - Migrated all primary design color accents, title gradients, container backgrounds, button hover shadows, and loading indicators to a true, vibrant cyan/turquoise palette (`#00bcd4` and `#0097a7`). This removes the previous sky-blue tints and uses genuine cyan/aquamarine shades that remain highly readable and clean.
 
-### 7. Realistic Precipitation Thresholds
-- Refined the weather classification thresholds inside [rules.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/rules.py) to map to realistic meteorological classifications:
-  - **Rain (Above Freezing)**:
-    - **Yellow (Light Drizzle/Rain)**: Up to `1.5 mm/h` (manageable with proper shell gear).
-    - **Red (Moderate/Heavy)**: `> 1.5 mm/h` (high wet-out and rapid snowpack degradation risk).
-  - **Snow (At/Below Freezing)**:
-    - **Yellow (Light Snow)**: Up to `2.5 mm/h` (flurries).
-    - **Red (Heavy Snow)**: `> 2.5 mm/h` (risk of rapid snow accumulation and avalanches).
-- Updated the assertions and mocked metrics inside the test suite (`tests/test_rules.py` and `tests/test_golden_set.py`) to align with these parameters.
+### 7. Realistic Weather & Safety Thresholds
+Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/rules.py) to represent realistic alpine hazard triggers:
+- **Rain (Above Freezing)**: Red threshold set to `> 1.5 mm/h` (moderate/heavy rain wetting out gear/destabilizing snowpack), while `≤ 1.5 mm/h` is Yellow (manageable light rain).
+- **Snow (Below Freezing)**: Red threshold set to `> 2.5 mm/h` liquid equivalent (~2.5 cm/h snow accumulation, triggering high avalanche and navigation hazard), while `≤ 2.5 mm/h` is Yellow (light snow).
+- **Freezing Level**: Trailhead/Base tiers (`≤ 4000 ft` elevation) do not have alpine crevasse/rockfall hazards. We now skip freezing level melting warnings for these tiers (capping them at Green, or Yellow if extremely hot at `> 12000 ft`), preventing warm valley trailheads from turning the entire region Red.
+- **Cloud Cover**: Shunted the Red whiteout hazard threshold to `> 95.0%` (fully overcast fog/deck), while broken/cloudy skies (`50%` to `95%`) are classed as Yellow.
+- **Wind**: Maintained Red at `> 30 mph` (ridge walking hazards) and Yellow at `15 - 30 mph`.
+- **Visibility**: Maintained Red at `< 3 km` (navigation/whiteout hazard) and Yellow at `3 - 10 km`.
 
 ---
 
@@ -46,7 +45,7 @@ We have successfully refined the mountaineering conditions board's layout and st
 All 22 unit and integration tests continue to pass cleanly:
 ```bash
 uv run pytest
-======================== 22 passed, 5 warnings in 27.80s ========================
+======================== 22 passed, 5 warnings in 44.40s ========================
 ```
 
 ### 2. Manual Verification
