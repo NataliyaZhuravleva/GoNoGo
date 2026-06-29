@@ -578,6 +578,24 @@ def serve_dashboard():
                 return "R";
             };
 
+            const getTooltipText = (partLabel, timeRange, partData) => {
+                let issues = [];
+                const metrics = ["wind", "precipitation", "freezing_level", "visibility", "cloud_cover"];
+                metrics.forEach(k => {
+                    const met = partData[k];
+                    if (met && met.color !== "Green") {
+                        const formattedLabel = k.charAt(0).toUpperCase() + k.slice(1).replace('_', ' ');
+                        issues.push(`${formattedLabel}: ${met.reason}`);
+                    }
+                });
+                
+                if (issues.length === 0) {
+                    return `${partLabel} (${timeRange}): Green - Safe conditions`;
+                }
+                
+                return `${partLabel} (${timeRange}): ${partData.composite_color} - ${issues.join("; ")}`;
+            };
+
             let isLoading = false;
 
             const loadReport = async () => {
@@ -659,13 +677,13 @@ def serve_dashboard():
 
                                 cells += `
                                     <td style="text-align: center; padding: 0.4rem 0.25rem; width: 35px; min-width: 35px; max-width: 35px;">
-                                        <span class="dot-cell ${colorClassMap[m.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="AM (4am-12pm): ${m.composite_color} - ${m.wind.reason}"></span>
+                                        <span class="dot-cell ${colorClassMap[m.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="${getTooltipText('AM', '4am-12pm', m)}"></span>
                                     </td>
                                     <td style="text-align: center; padding: 0.4rem 0.25rem; width: 35px; min-width: 35px; max-width: 35px;">
-                                        <span class="dot-cell ${colorClassMap[d.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="PM (12pm-8pm): ${d.composite_color} - ${d.precipitation.reason}"></span>
+                                        <span class="dot-cell ${colorClassMap[d.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="${getTooltipText('PM', '12pm-8pm', d)}"></span>
                                     </td>
                                     <td style="text-align: center; padding: 0.4rem 0.25rem; width: 35px; min-width: 35px; max-width: 35px; border-right: 2px solid var(--border-color);">
-                                        <span class="dot-cell ${colorClassMap[e.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="Night (8pm-4am): ${e.composite_color} - ${e.visibility.reason}"></span>
+                                        <span class="dot-cell ${colorClassMap[e.composite_color.toLowerCase()] || "bg-red"}" data-tooltip="${getTooltipText('Night', '8pm-4am', e)}"></span>
                                     </td>
                                 `;
                             });

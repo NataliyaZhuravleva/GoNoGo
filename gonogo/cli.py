@@ -179,8 +179,8 @@ async def run_pipeline(use_color: bool):
         print(f"{idx:2d}. {reg['name']} (Headline Peak: {headline_name})")
         
         if reg_forecast:
-            past_precip = reg_forecast.get("past_48h_precip_mm", 0.0)
-            print(f"    [Past 48h Precip: {past_precip:.1f} mm]")
+            past_precip_in = reg_forecast.get("past_48h_precip_mm", 0.0) / 25.4
+            print(f"    [Past 48h Precip: {past_precip_in:.2f} inches]")
             
         print(f"    Note: {note}")
         print()

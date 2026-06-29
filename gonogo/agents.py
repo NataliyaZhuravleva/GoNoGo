@@ -128,7 +128,8 @@ class OrchestratorAgent(BaseAgent):
         lines = []
         for reg in forecast_data:
             lines.append(f"Region: {reg['region_name']} (ID: {reg['region_id']}, Headline Peak: {reg['headline_peak_name']})")
-            lines.append(f"Past 48h Precipitation: {reg['past_48h_precip_mm']:.1f} mm")
+            past_precip_in = reg['past_48h_precip_mm'] / 25.4
+            lines.append(f"Past 48h Precipitation: {past_precip_in:.2f} inches")
             for tier_key in ["base", "mid", "peak"]:
                 tier = reg["tiers"][tier_key]
                 lines.append(f"  - {tier['tier_name']} Tier ({int(tier['elevation_ft'])} ft) - Worst Color Verdict: {tier['composite_color']}")
