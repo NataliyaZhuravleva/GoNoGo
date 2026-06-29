@@ -137,49 +137,20 @@ async def test_orchestrator_pipeline(mock_region_forecast):
     # 1st step: yields function call for load_skill
     # 2nd step: returns the markdown JSON code block
     async def mock_generate_content(*args, **kwargs):
-        contents = kwargs.get("contents") or args[1]
-        has_tool_response = False
-        for content in contents:
-            for part in content.parts:
-                if part.function_response:
-                    has_tool_response = True
-                    break
-
-        if not has_tool_response:
-            return types.GenerateContentResponse(
-                candidates=[
-                    types.Candidate(
-                        content=types.Content(
-                            role="model",
-                            parts=[
-                                types.Part(
-                                    function_call=types.FunctionCall(
-                                        name="load_skill",
-                                        args={
-                                            "skill_name": "mountaineering-conditions-skill"
-                                        },
-                                    )
-                                )
-                            ],
-                        )
+        return types.GenerateContentResponse(
+            candidates=[
+                types.Candidate(
+                    content=types.Content(
+                        role="model",
+                        parts=[
+                            types.Part.from_text(
+                                text=f"```json\n{json.dumps(mock_llm_response)}\n```"
+                            )
+                        ],
                     )
-                ]
-            )
-        else:
-            return types.GenerateContentResponse(
-                candidates=[
-                    types.Candidate(
-                        content=types.Content(
-                            role="model",
-                            parts=[
-                                types.Part.from_text(
-                                    text=f"```json\n{json.dumps(mock_llm_response)}\n```"
-                                )
-                            ],
-                        )
-                    )
-                ]
-            )
+                )
+            ]
+        )
 
     # Patch both generate_content and generate_content_stream on a mock api_client
     async def mock_generate_content_stream(*args, **kwargs):

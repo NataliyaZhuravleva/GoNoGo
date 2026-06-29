@@ -7,8 +7,6 @@ from datetime import date
 from google.adk.agents import Agent, BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event, EventActions
-from google.adk.skills import load_skill_from_dir
-from google.adk.tools.skill_toolset import SkillToolset
 from google.adk.utils.context_utils import Aclosing
 from google.genai import types
 from typing_extensions import override
@@ -70,8 +68,9 @@ class AdvisorAgentFactory:
         if not os.path.exists(skills_dir):
             raise FileNotFoundError(f"Skill directory not found at {skills_dir}")
 
-        skill = load_skill_from_dir(skills_dir)
-        skill_toolset = SkillToolset(skills=[skill])
+        skill_file = os.path.join(skills_dir, "SKILL.md")
+        with open(skill_file, "r", encoding="utf-8") as f:
+            skill_content = f.read()
 
         # Advisor instruction with dynamic state injection placeholder
         instruction = (
@@ -79,10 +78,11 @@ class AdvisorAgentFactory:
             "across 12 regions and provide conditions notes and top recommendations.\n\n"
             "Here is the weather forecast data for the requested date range:\n"
             "{forecast_data_summary}\n\n"
-            'You MUST use the `load_skill` tool with skill_name="mountaineering-conditions-skill" to read and load the '
-            "mountaineering domain knowledge and rules regarding wind thresholds, freezing level elevation hazards (freeze-thaw "
-            "and rockfall), precipitation types (rain vs. snow hazards), and visibility/whiteout hazards. DO NOT skip this step.\n\n"
-            "Based on the data and the skill guidelines, write:\n"
+            "Use the following mountaineering conditions evaluation guidelines to evaluate safety and hazards:\n"
+            "============================================================\n"
+            f"{skill_content}\n"
+            "============================================================\n\n"
+            "Based on the data and the guidelines, write:\n"
             "1. A short, professional conditions note (1-2 sentences) for each of the 12 regions. Focus on specific hazards "
             "relevant to mountaineers (e.g. warm freezing levels relative to peak, exposed high winds, rain on snow, or low visibility "
             "whiteout risk).\n"
@@ -105,7 +105,6 @@ class AdvisorAgentFactory:
             name=name,
             model="gemini-2.5-flash",
             instruction=instruction,
-            tools=[skill_toolset],
         )
 
 
