@@ -1,28 +1,61 @@
 metrics_to_run:
-  - custom_response_quality
+  - local_response_quality
 
 custom_metrics:
-  - name: custom_response_quality
-    prompt_template: |
-      You are an expert quality assurance evaluator for an enterprise AI assistant. Your task is to evaluate the agent's final response given the user prompt and the full agent trace (for tool-call and reasoning context).
-
-      Please grade the response quality on a scale of 1 to 5 according to the following criteria:
-      1 (Poor): The response fails to address the query, contains incorrect information, or is highly confusing.
-      2 (Below Average): The response partially addresses the query but has notable inaccuracies, gaps, or unclear structure.
-      3 (Acceptable): The response adequately answers the query but lacks depth, clear structure, or misses minor details.
-      4 (Good): The response is accurate, well-structured, and covers the query thoroughly with minor room for improvement.
-      5 (Excellent): The response is highly relevant, comprehensive, flawlessly accurate, and excellently structured.
-
-      ### Target Evaluation:
-      User Prompt: {prompt}
-      Final Response: {response}
-      Full Agent Trace: {agent_data}
-
-      Return your evaluation as a valid JSON object matching this structure:
-      {
-        "score": <integer between 1 and 5>,
-        "explanation": "<detailed string explaining the rationale for the score assigned>"
-      }
+  - name: local_response_quality
+    custom_function: |
+      def evaluate(instance):
+          import os
+          import json
+          from google.genai import Client
+          from dotenv import load_dotenv
+          
+          try:
+              # 1. Dynamically load the local .env file
+              env_path = os.path.join(os.getcwd(), ".env")
+              load_dotenv(dotenv_path=env_path)
+              api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+              
+              if not api_key:
+                  return {"score": 1, "explanation": "No GOOGLE_API_KEY found in .env"}
+                  
+              # 2. Extract the user prompt and agent response
+              prompt_text = ""
+              prompt_parts = instance.get("prompt", {}).get("parts", [])
+              if prompt_parts:
+                  prompt_text = prompt_parts[0].get("text", "")
+              else:
+                  turns = (instance.get("agent_data") or {}).get("turns", [])
+                  if turns:
+                      prompt_text = str(turns)
+                      
+              response_text = instance.get("response", {}).get("parts", [{}])[0].get("text", "")
+              
+              # 3. Initialize the Gemini Client
+              client = Client(api_key=api_key)
+              
+              # 4. Request evaluation from Gemini
+              rubric = f"""
+              Evaluate the quality of the AI response on a scale from 1 to 5:
+              1 (Poor): Irrelevant, inaccurate, or formatting errors.
+              5 (Excellent): Highly relevant PNW conditions info, comprehensive safety analysis, formatted as a clean JSON block, and aligned with safety rules.
+              
+              User Prompt: {prompt_text}
+              AI Response: {response_text}
+              
+              Return a JSON object matching this structure:
+              {{"score": <1-5>, "explanation": "<reason>"}}
+              """
+              
+              res = client.models.generate_content(
+                  model="gemini-2.5-flash",
+                  contents=rubric,
+                  config={"response_mime_type": "application/json"}
+              )
+              data = json.loads(res.text)
+              return {"score": int(data.get("score", 3)), "explanation": data.get("explanation", "")}
+          except Exception as e:
+              return {"score": 1, "explanation": f"Local evaluation failed: {e}"}
   - name: agent_turn_count
     custom_function: |
       def evaluate(instance):
