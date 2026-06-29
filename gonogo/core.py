@@ -212,7 +212,7 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
         "latitude": ",".join(str(lat) for lat in lats),
         "longitude": ",".join(str(lon) for lon in lons),
         "elevation": ",".join(str(round(e)) for e in elevs_m),
-        "hourly": "temperature_2m,precipitation,wind_speed_10m,cloud_cover,visibility,freezing_level_height",
+        "hourly": "temperature_2m,precipitation,wind_gusts_10m,cloud_cover,visibility,freezing_level_height",
         "timezone": "America/Los_Angeles",
         "past_days": 2,
     }
@@ -261,7 +261,7 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
         times = hourly["time"]
         temps_c = hourly["temperature_2m"]
         precips = hourly["precipitation"]
-        winds_kmh = hourly["wind_speed_10m"]
+        winds_kmh = hourly["wind_gusts_10m"]
         clouds = hourly["cloud_cover"]
         visibilities = hourly["visibility"]
         freezing_m = hourly["freezing_level_height"]
