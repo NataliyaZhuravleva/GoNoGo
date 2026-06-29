@@ -507,16 +507,21 @@ def serve_dashboard():
             transform: translateX(-50%) translateY(-6px);
             background: #1e293b;
             color: #fff;
-            padding: 0.35rem 0.6rem;
+            padding: 0.45rem 0.75rem;
             border-radius: 6px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 400;
-            white-space: nowrap;
+            width: max-content;
+            max-width: 250px;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.4;
+            text-align: left;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.15s;
             z-index: 10;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
 
         .dot-cell:hover::after {
