@@ -45,9 +45,19 @@ custom_metrics:
               
               # 4. Request evaluation from Gemini
               rubric = f"""
-              Evaluate the quality of the AI response on a scale from 1 to 5:
-              1 (Poor): Irrelevant, inaccurate, or formatting errors.
-              5 (Excellent): Highly relevant PNW conditions info, comprehensive safety analysis, formatted as a clean JSON block, and aligned with safety rules.
+              You are an expert Pacific Northwest mountaineering QA evaluator. 
+              Your task is to grade the AI agent's response on a scale from 1 to 5 based on whether it provides all the required weather and hazard data necessary for a climber to make a safe decision.
+              
+              ### Grading Criteria:
+              1 (Poor): Response lacks critical forecast information, fails to follow JSON format, or provides generic advice.
+              3 (Acceptable): Response provides a recommendation and notes, but misses details on one or more key weather parameters.
+              5 (Excellent): Response is in clean JSON format, and successfully evaluates all required weather parameters across the regions:
+                - Wind speeds (ridge exposure/gusts)
+                - Freezing levels (melting, rockfall, or avalanche hazards)
+                - Precipitation type (distinguishing between rain vs. snow)
+                - Cloud cover and visibility (whiteout/navigation risk)
+                
+              Evaluate if the AI Response provides sufficient details on these parameters so a climber has all the necessary data to make a safe decision.
               
               User Prompt: {prompt_text}
               AI Response: {response_text}
