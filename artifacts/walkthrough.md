@@ -1,6 +1,6 @@
 # Walkthrough - GoNoGo Weekly Forecast (Phase 3.7 - Board Density & Timeframes)
 
-We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic tooltips, and correct the trailhead freezing level safety logic:
+We have successfully refined the mountaineering conditions board's layout and styling to increase vertical data density, align column widths, adopt a true cyan/turquoise palette, update rules thresholds for all metrics, standardize on American units, implement dynamic wrapped tooltips, and correct the trailhead freezing level safety logic:
 
 ## Changes Made
 
@@ -37,9 +37,10 @@ Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravle
 - **Wind**: Maintained Red at `> 30 mph` (ridge walking hazards) and Yellow at `15 - 30 mph`.
 - **Visibility**: Maintained Red at `< 3 km` (navigation/whiteout hazard) and Yellow at `3 - 10 km`.
 
-### 8. Dynamic Hover Tooltips
-- Replaced the previous layout where cell tooltips were hardcoded to show only a single parameter (e.g. wind for AM, precipitation for PM). 
-- Implemented a dynamic JS helper function `getTooltipText` inside [fast_api_app.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/fast_api_app.py) that inspects all weather metrics for the day-part and outputs a list of all metrics that are triggering Yellow or Red states (e.g. "PM (12pm-8pm): Red - Precipitation: Moderate/heavy rain (0.10 in/h); Cloud cover: Overcast/foggy (98%)").
+### 8. Dynamic & Wrapped Hover Tooltips
+- Replaced the previous layout where cell tooltips were hardcoded to show only a single parameter.
+- Implemented a dynamic JS helper function `getTooltipText` inside [fast_api_app.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/fast_api_app.py) that inspects all weather metrics for the day-part and outputs a list of all metrics that are triggering Yellow or Red states.
+- Re-styled `.dot-cell::after` in [fast_api_app.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/fast_api_app.py): replaced `white-space: nowrap;` with `white-space: normal;`, set `max-width: 250px`, and set `text-align: left;` to ensure long text tooltips wrap nicely and are fully visible on screen.
 
 ### 9. Unified American Systems Units
 - Replaced metric units with standard US equivalents throughout the frontend tooltips, CLI, and advisor LLM logs:
@@ -55,7 +56,7 @@ Refined all 5 safety thresholds inside [rules.py](file:///Users/nataliyazhuravle
 All 22 unit and integration tests continue to pass cleanly:
 ```bash
 uv run pytest
-======================== 22 passed, 5 warnings in 50.72s ========================
+======================== 22 passed, 5 warnings in 25.02s ========================
 ```
 
 ### 2. Manual Verification
