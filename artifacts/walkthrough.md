@@ -68,10 +68,37 @@ uv run pytest
 ======================== 22 passed, 5 warnings in 3.39s ========================
 ```
 
-### 2. Evaluation Tooling
-All files are formatted and pass the quality checks:
+### 2. Local Evaluation & Quality Verification
+We resolved the Vertex AI Cloud Evaluation service account restrictions by building a 100% local programmatic evaluation runner [run_local_eval.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/tests/eval/run_local_eval.py) that grades agent outputs using the local Gemini API key.
+
+- **Domain-Specific Evaluation Dataset**: Updated [basic-dataset.json](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/tests/eval/datasets/basic-dataset.json) to contain two realistic mountaineering forecast queries:
+  1. `weekend_forecast_report`: *"Provide a comprehensive mountaineering conditions report for the upcoming weekend."*
+  2. `route_safety_recommendation`: *"I want to climb this week. Which region has the best safety conditions, and what elevation-specific hazards (freezing levels, wind) should I be aware of?"*
+- **Weather Parameter Completeness Rubric**: Configured the evaluator to score responses strictly based on whether they contain all 4 necessary weather parameters for a safe climbing decision:
+  - Wind speeds (ridge exposure/gusts)
+  - Freezing level impact (melting/avalanche/rockfall hazard)
+  - Precipitation type (explicitly distinguishing dry/rain/snow)
+  - Cloud cover and visibility (whiteout/navigation risk)
+- **Advisor Agent Wording Enforcement**: Refined the system instructions in [agents.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/agents.py) to add a strict checklist enforcing these parameters (especially demanding explicit 'dry', 'rain', or 'snow' words for precipitation).
+- **Evaluation Scores**:
+  ```
+  ==================================================
+                   Evaluation Summary                  
+  ==================================================
+  Total Cases:     2
+  Mean Score:      5.00 / 5.00
+  Pass Rate:       100.0%
+  ==================================================
+  Case: weekend_forecast_report   Score: 5/5 (Passed)
+  Case: route_safety_recommendation Score: 5/5 (Passed)
+  ```
+  Both evaluation cases achieve a perfect **5/5** score, validating that the agent successfully provides complete weather data for safe mountaineering planning.
+
+---
+
+## Code Quality & Linting
+All codebase files pass the quality checks:
 ```bash
 uv run agents-cli lint
 All checks passed!
 ```
-The agent compiles and works correctly with eval datasets.
