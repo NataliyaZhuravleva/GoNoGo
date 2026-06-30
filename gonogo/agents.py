@@ -86,7 +86,7 @@ class AdvisorAgentFactory:
             "1. A concise, professional conditions note (2-3 sentences) for each of the 12 regions. To enable safe decision-making, each note MUST explicitly address:\n"
             "   - Wind status (e.g., calm, moderate, or high gusts).\n"
             "   - Freezing level impact (e.g., frozen/firm snow vs. melting/rockfall/avalanche risk).\n"
-            "   - Precipitation status (explicitly stating whether it is dry, rain, or snow).\n"
+            "   - Precipitation status: You MUST explicitly state the precipitation type using the words 'dry' (or 'no precipitation'), 'rain', or 'snow'. Do not use vague terms like 'precipitation' or 'moisture'.\n"
             "   - Visibility and whiteout risk.\n"
             "2. One top overall recommendation specifying the best region (and day, if a range was selected) to climb, with "
             "a clear, convincing rationale.\n\n"
