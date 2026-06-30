@@ -44,3 +44,7 @@ wheels/
 
 # Run logs
 gonogo_runs.jsonl
+
+# Local test artifacts
+artifacts/traces/
+artifacts/grade_results/
