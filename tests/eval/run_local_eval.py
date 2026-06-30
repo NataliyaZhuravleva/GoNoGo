@@ -61,23 +61,19 @@ def main():
         )
 
         rubric = f"""
-        You are an expert Pacific Northwest mountaineering QA evaluator.
-        Your task is to grade the AI agent's response on a scale from 1 to 5 based on whether it provides all the required weather and hazard data necessary for a climber to make a safe decision.
-
+        You are an expert Pacific Northwest mountaineering QA evaluator. 
+        Your task is to grade the AI agent's response on a scale from 1 to 5 based on whether it provides all the required weather and hazard data necessary for a climber to make a safe decision, and whether its top recommendation follows safety ranking rules.
+        
         ### Grading Criteria:
-        1 (Poor): Response lacks critical forecast information, fails to follow JSON format, or provides generic advice.
-        3 (Acceptable): Response provides a recommendation and notes, but misses details on one or more key weather parameters.
-        5 (Excellent): Response is in clean JSON format, and successfully evaluates all required weather parameters across the regions:
-          - Wind speeds (ridge exposure/gusts)
-          - Freezing levels (melting, rockfall, or avalanche hazards)
-          - Precipitation type (distinguishing between rain vs. snow)
-          - Cloud cover and visibility (whiteout/navigation risk)
-
-        Evaluate if the AI Response provides sufficient details on these parameters so a climber has all the necessary data to make a safe decision.
-
+        1 (Poor): Response lacks critical forecast information, fails to follow JSON format, OR violates safety rules by recommending an option with Red hazards when safer zero-Red options are available, OR fails to recommend staying home when all options contain Red hazards.
+        3 (Acceptable): Response provides a recommendation and notes, but misses details on one or more key weather parameters, or has minor ranking flaws.
+        5 (Excellent): Response is in clean JSON format, successfully evaluates all required weather parameters (winds, freezing level, precipitation type, visibility) across all regions, AND its top recommendation correctly prioritizes zero-Red safety options or recommends staying home if all options are hazardous (Red).
+          
+        Evaluate if the AI Response provides sufficient details on these parameters so a climber has all the necessary data to make a safe decision, and check if the top recommendation aligns with the safety ranking rules.
+        
         User Prompt: {prompt_text}
         AI Response: {response_text}
-
+        
         Return a JSON object matching this structure:
         {{"score": <1-5>, "explanation": "<reason>"}}
         """
