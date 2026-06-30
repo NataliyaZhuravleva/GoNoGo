@@ -519,7 +519,7 @@ def serve_dashboard():
             font-size: 0.75rem;
             font-weight: 400;
             width: max-content;
-            max-width: 250px;
+            max-width: 400px;
             white-space: normal;
             word-wrap: break-word;
             line-height: 1.4;
@@ -597,7 +597,7 @@ def serve_dashboard():
                 const metrics = ["wind", "precipitation", "freezing_level", "visibility", "cloud_cover"];
                 metrics.forEach(k => {
                     const met = partData[k];
-                    if (met && met.color !== "Green") {
+                    if (met) {
                         const formattedLabel = k.charAt(0).toUpperCase() + k.slice(1).replace('_', ' ');
                         issues.push(`${formattedLabel}: ${met.reason}`);
                     }
@@ -607,7 +607,7 @@ def serve_dashboard():
                     return `${partLabel} (${timeRange}): Green - Safe conditions`;
                 }
 
-                return `${partLabel} (${timeRange}): ${partData.composite_color} - ${issues.join("; ")}`;
+                return `${partLabel} (${timeRange}): ${issues.join('; ')}`;
             };
 
             let isLoading = false;

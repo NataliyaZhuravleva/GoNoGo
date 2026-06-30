@@ -2,9 +2,10 @@
 from typing_extensions import TypedDict
 
 
-class MetricVerdict(TypedDict):
+class MetricVerdict(TypedDict, total=False):
     color: str
     reason: str
+    value: float
 
 
 class CellVerdict(TypedDict):
@@ -23,47 +24,53 @@ def evaluate_wind(wind_speed_mph: float, is_gust: bool = False) -> MetricVerdict
         return {
             "color": "Green",
             "reason": f"Calm/light {label} ({wind_speed_mph:.1f} mph)",
+            "value": wind_speed_mph,
         }
     elif wind_speed_mph <= 30.0:
         return {
             "color": "Yellow",
             "reason": f"Moderate {label} ({wind_speed_mph:.1f} mph), watch exposure",
+            "value": wind_speed_mph,
         }
     else:
         return {
             "color": "Red",
             "reason": f"High {label} ({wind_speed_mph:.1f} mph), dangerous on ridges",
+            "value": wind_speed_mph,
         }
 
 
 def evaluate_precipitation(precip_mm: float, temp_f: float) -> MetricVerdict:
-    """Evaluate precipitation type and intensity."""
+    """Evaluate precipitation type and intensity in inches."""
     precip_in = precip_mm / 25.4
-    if precip_mm <= 0.01:
-        return {"color": "Green", "reason": "No precipitation"}
+    if precip_in <= 0.004:
+        return {"color": "Green", "reason": "No precipitation", "value": precip_in}
 
     is_rain = temp_f > 32.0
 
     if is_rain:
         # Rain is highly discouraged in mountaineering (wet out, snow instability)
-        if precip_mm <= 1.5:
+        if precip_in <= 0.06:
             return {
                 "color": "Yellow",
                 "reason": f"Light rain/drizzle ({precip_in:.2f} in/h)",
+                "value": precip_in,
             }
         else:
             return {
                 "color": "Red",
                 "reason": f"Moderate/heavy rain ({precip_in:.2f} in/h)",
+                "value": precip_in,
             }
     else:
         # Snow conditions
-        if precip_mm <= 2.5:
-            return {"color": "Yellow", "reason": f"Light snow ({precip_in:.2f} in/h)"}
+        if precip_in <= 0.04:
+            return {"color": "Yellow", "reason": f"Light snow ({precip_in:.2f} in/h)", "value": precip_in}
         else:
             return {
                 "color": "Red",
                 "reason": f"Heavy snow ({precip_in:.2f} in/h), high accumulation risk",
+                "value": precip_in,
             }
 
 
@@ -76,12 +83,14 @@ def evaluate_freezing_level(
         return {
             "color": "Green",
             "reason": f"Safe base conditions (freezing level at {freezing_level_ft:.0f} ft)",
+            "value": freezing_level_ft,
         }
 
     if freezing_level_ft <= tier_elevation_ft:
         return {
             "color": "Green",
             "reason": f"Freezing level ({freezing_level_ft:.0f} ft) is below tier ({tier_elevation_ft:.0f} ft)",
+            "value": freezing_level_ft,
         }
 
     diff = freezing_level_ft - tier_elevation_ft
@@ -89,16 +98,19 @@ def evaluate_freezing_level(
         return {
             "color": "Green",
             "reason": f"Freezing level ({freezing_level_ft:.0f} ft) is close to tier ({tier_elevation_ft:.0f} ft)",
+            "value": freezing_level_ft,
         }
     elif diff <= 3000.0:
         return {
             "color": "Yellow",
             "reason": f"Freezing level ({freezing_level_ft:.0f} ft) is {diff:.0f} ft above tier (moderate melting)",
+            "value": freezing_level_ft,
         }
     else:
         return {
             "color": "Red",
             "reason": f"Freezing level ({freezing_level_ft:.0f} ft) is {diff:.0f} ft above tier (high rockfall/wet avalanche risk)",
+            "value": freezing_level_ft,
         }
 
 
@@ -106,16 +118,18 @@ def evaluate_visibility(visibility_meters: float) -> MetricVerdict:
     """Evaluate visibility."""
     visibility_mi = visibility_meters / 1609.34
     if visibility_meters >= 10000.0:
-        return {"color": "Green", "reason": f"Good visibility ({visibility_mi:.1f} mi)"}
+        return {"color": "Green", "reason": f"Good visibility ({visibility_mi:.1f} mi)", "value": visibility_meters}
     elif visibility_meters >= 3000.0:
         return {
             "color": "Yellow",
             "reason": f"Moderate visibility ({visibility_mi:.1f} mi)",
+            "value": visibility_meters,
         }
     else:
         return {
             "color": "Red",
             "reason": f"Low visibility ({visibility_mi:.1f} mi), navigation risk",
+            "value": visibility_meters,
         }
 
 
@@ -125,16 +139,19 @@ def evaluate_cloud_cover(cloud_cover_pct: float) -> MetricVerdict:
         return {
             "color": "Green",
             "reason": f"Clear/mostly clear ({cloud_cover_pct:.0f}%)",
+            "value": cloud_cover_pct,
         }
     elif cloud_cover_pct <= 95.0:
         return {
             "color": "Yellow",
             "reason": f"Partly/mostly cloudy ({cloud_cover_pct:.0f}%)",
+            "value": cloud_cover_pct,
         }
     else:
         return {
             "color": "Red",
             "reason": f"Overcast/foggy ({cloud_cover_pct:.0f}%), whiteout risk",
+            "value": cloud_cover_pct,
         }
 
 

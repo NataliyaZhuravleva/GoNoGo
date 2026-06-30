@@ -29,22 +29,22 @@ def test_evaluate_wind():
 
 
 def test_evaluate_precipitation():
-    # Green threshold: <= 0.01 mm/h
+    # Green threshold: <= 0.004 in/h (approx 0.1 mm/h)
     assert evaluate_precipitation(0.0, 40.0)["color"] == "Green"
-    assert evaluate_precipitation(0.01, 20.0)["color"] == "Green"
+    assert evaluate_precipitation(0.1, 20.0)["color"] == "Green"
 
-    # Yellow threshold (Snow, temp <= 32F): 0.01 < precip <= 2.5 mm/h
-    assert evaluate_precipitation(1.0, 30.0)["color"] == "Yellow"
-    assert evaluate_precipitation(2.5, 32.0)["color"] == "Yellow"
+    # Yellow threshold (Snow, temp <= 32F): 0.004 < precip_in <= 0.04 in/h (approx 0.1 < precip <= 1.0 mm/h)
+    assert evaluate_precipitation(0.5, 30.0)["color"] == "Yellow"
+    assert evaluate_precipitation(1.0, 32.0)["color"] == "Yellow"
 
-    # Red threshold (Snow): > 2.5 mm/h
-    assert evaluate_precipitation(2.6, 30.0)["color"] == "Red"
+    # Red threshold (Snow): > 0.04 in/h (approx > 1.0 mm/h)
+    assert evaluate_precipitation(1.1, 30.0)["color"] == "Red"
 
-    # Yellow threshold (Rain, temp > 32F): 0.01 < precip <= 1.5 mm/h
+    # Yellow threshold (Rain, temp > 32F): 0.004 < precip_in <= 0.06 in/h (approx 0.1 < precip <= 1.5 mm/h)
     assert evaluate_precipitation(0.5, 40.0)["color"] == "Yellow"
     assert evaluate_precipitation(1.5, 40.0)["color"] == "Yellow"
 
-    # Red threshold (Rain): > 1.5 mm/h
+    # Red threshold (Rain): > 0.06 in/h (approx > 1.5 mm/h)
     assert evaluate_precipitation(1.6, 35.0)["color"] == "Red"
 
 

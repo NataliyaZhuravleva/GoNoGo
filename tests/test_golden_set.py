@@ -51,6 +51,19 @@ def make_mock_hourly(
             "cloud_cover": [cloud_pct] * num_hours,
             "visibility": [vis_m] * num_hours,
             "freezing_level_height": [freezing_m] * num_hours,
+            "wind_speed_1000hPa": [wind_kmh] * num_hours,
+            "wind_speed_975hPa": [wind_kmh] * num_hours,
+            "wind_speed_950hPa": [wind_kmh] * num_hours,
+            "wind_speed_925hPa": [wind_kmh] * num_hours,
+            "wind_speed_900hPa": [wind_kmh] * num_hours,
+            "wind_speed_850hPa": [wind_kmh] * num_hours,
+            "wind_speed_800hPa": [wind_kmh] * num_hours,
+            "wind_speed_750hPa": [wind_kmh] * num_hours,
+            "wind_speed_700hPa": [wind_kmh] * num_hours,
+            "wind_speed_650hPa": [wind_kmh] * num_hours,
+            "wind_speed_600hPa": [wind_kmh] * num_hours,
+            "wind_speed_550hPa": [wind_kmh] * num_hours,
+            "wind_speed_500hPa": [wind_kmh] * num_hours,
         }
     }
 

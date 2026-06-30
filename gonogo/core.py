@@ -147,7 +147,28 @@ def validate_and_clamp_date_range(
     return start_date, end_date, warning_msg
 
 
-# --- Open-Meteo Batched Fetcher ---
+def get_nearest_pressure_level_variable(elev_ft: float) -> str:
+    """Map elevation in feet to the closest standard pressure level in hPa.
+
+    Standard pressure levels and their corresponding typical elevations in feet.
+    """
+    levels = [
+        (1000, 364),
+        (975, 1066),
+        (950, 1772),
+        (925, 2497),
+        (900, 3245),
+        (850, 4780),
+        (800, 6394),
+        (750, 8091),
+        (700, 9879),
+        (650, 11768),
+        (600, 13776),
+        (550, 15925),
+        (500, 18287),
+    ]
+    best_hpa = min(levels, key=lambda pair: abs(pair[1] - elev_ft))[0]
+    return f"wind_speed_{best_hpa}hPa"
 
 
 def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
@@ -212,7 +233,11 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
         "latitude": ",".join(str(lat) for lat in lats),
         "longitude": ",".join(str(lon) for lon in lons),
         "elevation": ",".join(str(round(e)) for e in elevs_m),
-        "hourly": "temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m,cloud_cover,visibility,freezing_level_height",
+        "hourly": (
+            "temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m,cloud_cover,visibility,freezing_level_height,"
+            "wind_speed_1000hPa,wind_speed_975hPa,wind_speed_950hPa,wind_speed_925hPa,wind_speed_900hPa,wind_speed_850hPa,wind_speed_800hPa,"
+            "wind_speed_750hPa,wind_speed_700hPa,wind_speed_650hPa,wind_speed_600hPa,wind_speed_550hPa,wind_speed_500hPa"
+        ),
         "timezone": "America/Los_Angeles",
         "past_days": 2,
     }
@@ -222,6 +247,7 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
     response.raise_for_status()
 
     raw_data = response.json()
+ 
     if not isinstance(raw_data, list):
         # Open-Meteo returns a single dictionary if only one coordinate is requested,
         # but for multiple coordinates it returns a list of dictionaries.
@@ -262,7 +288,7 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
         temps_c = hourly["temperature_2m"]
         precips = hourly["precipitation"]
         winds_kmh = hourly["wind_speed_10m"]
-        gusts_kmh = hourly.get("wind_gusts_10m")
+
         clouds = hourly["cloud_cover"]
         visibilities = hourly["visibility"]
         freezing_m = hourly["freezing_level_height"]
@@ -289,27 +315,15 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
 
                     t_f = celsius_to_fahrenheit(temps_c[t_idx])
                     p_mm = precips[t_idx]
-                    # Calculate altitude-based wind scaling factor (boundary layer correction)
-                    # Wind speeds at high altitudes are significantly higher due to lack of ground friction.
-                    if elev_ft <= 5000.0:
-                        wind_scale = 1.0
-                    elif elev_ft <= 10000.0:
-                        wind_scale = 1.0 + (elev_ft - 5000.0) / 5000.0
-                    else:
-                        wind_scale = 2.0 + (elev_ft - 10000.0) / 5000.0
+                    # Retrieve wind speed directly from the nearest pressure level (Mountain-Forecast methodology)
+                    p_wind_key = get_nearest_pressure_level_variable(elev_ft)
+                    sustained_kmh = hourly[p_wind_key][t_idx]
 
-                    sustained_mph = kmh_to_mph(winds_kmh[t_idx]) * wind_scale
-                    gust_mph = (
-                        kmh_to_mph(gusts_kmh[t_idx]) * wind_scale
-                        if gusts_kmh is not None and gusts_kmh[t_idx] is not None
-                        else None
-                    )
-                    w_mph = (
-                        max(sustained_mph, gust_mph)
-                        if gust_mph is not None
-                        else sustained_mph
-                    )
-                    is_gust = gust_mph is not None and gust_mph > sustained_mph
+                    # Convert pressure-level wind to mph
+                    sustained_mph = kmh_to_mph(sustained_kmh)
+                    # No gust logic – use sustained wind directly
+                    w_mph = sustained_mph
+                    is_gust = False
                     cloud_pct = clouds[t_idx]
                     vis_m = visibilities[t_idx]
                     freezing_ft = meters_to_feet(freezing_m[t_idx])
@@ -329,14 +343,15 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
                     # Fallback default if data missing
                     cell_verdict = {
                         "composite_color": "Red",
-                        "wind": {"color": "Red", "reason": "Data unavailable"},
-                        "precipitation": {"color": "Red", "reason": "Data unavailable"},
+                        "wind": {"color": "Red", "reason": "Data unavailable", "value": 0.0},
+                        "precipitation": {"color": "Red", "reason": "Data unavailable", "value": 0.0},
                         "freezing_level": {
                             "color": "Red",
                             "reason": "Data unavailable",
+                            "value": 0.0,
                         },
-                        "visibility": {"color": "Red", "reason": "Data unavailable"},
-                        "cloud_cover": {"color": "Red", "reason": "Data unavailable"},
+                        "visibility": {"color": "Red", "reason": "Data unavailable", "value": 0.0},
+                        "cloud_cover": {"color": "Red", "reason": "Data unavailable", "value": 0.0},
                     }
 
                 day_verdicts[part] = cell_verdict
