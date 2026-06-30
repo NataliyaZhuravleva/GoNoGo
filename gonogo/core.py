@@ -289,9 +289,18 @@ def fetch_conditions(start_date: date, end_date: date) -> list[RegionForecast]:
 
                     t_f = celsius_to_fahrenheit(temps_c[t_idx])
                     p_mm = precips[t_idx]
-                    sustained_mph = kmh_to_mph(winds_kmh[t_idx])
+                    # Calculate altitude-based wind scaling factor (boundary layer correction)
+                    # Wind speeds at high altitudes are significantly higher due to lack of ground friction.
+                    if elev_ft <= 5000.0:
+                        wind_scale = 1.0
+                    elif elev_ft <= 10000.0:
+                        wind_scale = 1.0 + (elev_ft - 5000.0) / 5000.0
+                    else:
+                        wind_scale = 2.0 + (elev_ft - 10000.0) / 5000.0
+
+                    sustained_mph = kmh_to_mph(winds_kmh[t_idx]) * wind_scale
                     gust_mph = (
-                        kmh_to_mph(gusts_kmh[t_idx])
+                        kmh_to_mph(gusts_kmh[t_idx]) * wind_scale
                         if gusts_kmh is not None and gusts_kmh[t_idx] is not None
                         else None
                     )
