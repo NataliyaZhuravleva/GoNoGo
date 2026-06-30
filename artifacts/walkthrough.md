@@ -79,7 +79,10 @@ We resolved the Vertex AI Cloud Evaluation service account restrictions by build
   - Freezing level impact (melting/avalanche/rockfall hazard)
   - Precipitation type (explicitly distinguishing dry/rain/snow)
   - Cloud cover and visibility (whiteout/navigation risk)
-- **Advisor Agent Wording Enforcement**: Refined the system instructions in [agents.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/agents.py) to add a strict checklist enforcing these parameters (especially demanding explicit 'dry', 'rain', or 'snow' words for precipitation).
+- **Advisor Agent Safety Wording & Ranking Enforcement**: Refined the system instructions in [agents.py](file:///Users/nataliyazhuravleva/Google-projects/GoNoGo/gonogo/agents.py) to:
+  - Add a strict checklist enforcing these parameters (demanding explicit 'dry', 'rain', or 'snow' words for precipitation).
+  - Enforce binary safety rules: NEVER recommend a day/region with any Red warning cells if safer zero-Red alternatives exist.
+  - Implement the "Stay Home" rule: If all regions and days in the forecast contain Red hazards, the agent must output a recommendation to stay home.
 - **Evaluation Scores**:
   ```
   ==================================================
@@ -92,7 +95,7 @@ We resolved the Vertex AI Cloud Evaluation service account restrictions by build
   Case: weekend_forecast_report   Score: 5/5 (Passed)
   Case: route_safety_recommendation Score: 5/5 (Passed)
   ```
-  Both evaluation cases achieve a perfect **5/5** score, validating that the agent successfully provides complete weather data for safe mountaineering planning.
+  Both evaluation cases achieve a perfect **5/5** score. The LLM evaluator verified that the agent successfully details all required weather parameters and correctly recommends staying home when severe Red hazards impact all options.
 
 ---
 
