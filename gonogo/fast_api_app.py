@@ -13,6 +13,10 @@
 # limitations under the License.
 import logging as std_logging
 import os
+import warnings
+
+# Suppress experimental feature warnings from ADK library during startup
+warnings.filterwarnings("ignore", category=UserWarning, module="google.adk")
 
 from dotenv import load_dotenv
 
@@ -40,17 +44,18 @@ class FallbackLogger:
 
 # Attempt to load Google Cloud Logging, fallback to stdout logger if unavailable
 try:
-    if os.environ.get("INTEGRATION_TEST") == "TRUE":
-        raise RuntimeError("Forced fallback for integration testing")
+    if os.environ.get("INTEGRATION_TEST") == "TRUE" or not os.environ.get("K_SERVICE"):
+        raise RuntimeError("Local environment - using fallback logger")
     from google.cloud import logging as google_cloud_logging
 
     _, project_id = google.auth.default()
     logging_client = google_cloud_logging.Client()
     logger = logging_client.logger(__name__)
 except Exception as e:
-    std_logging.warning(
-        f"Google Cloud Logging initialization failed, using fallback: {e}"
-    )
+    if os.environ.get("K_SERVICE"):
+        std_logging.warning(
+            f"Google Cloud Logging initialization failed, using fallback: {e}"
+        )
     logger = FallbackLogger(__name__)
 allow_origins = (
     os.getenv("ALLOW_ORIGINS", "").split(",") if os.getenv("ALLOW_ORIGINS") else None
@@ -65,13 +70,15 @@ session_service_uri = None
 
 artifact_service_uri = f"gs://{logs_bucket_name}" if logs_bucket_name else None
 
+is_deployed = bool(os.environ.get("K_SERVICE"))
+
 app: FastAPI = get_fast_api_app(
     agents_dir=AGENT_DIR,
     web=True,
     artifact_service_uri=artifact_service_uri,
     allow_origins=allow_origins,
     session_service_uri=session_service_uri,
-    otel_to_cloud=True,
+    otel_to_cloud=is_deployed,
 )
 app.title = "gonogo"
 app.description = "API for interacting with the Agent gonogo"
